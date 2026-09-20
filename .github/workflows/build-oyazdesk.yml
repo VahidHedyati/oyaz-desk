@@ -10,6 +10,8 @@ jobs:
   build-windows:
     name: Build Windows x64 Portable
     runs-on: windows-2022
+    env:
+      VCPKG_ROOT: C:\vcpkg
 
     steps:
       - name: Checkout Repository
@@ -37,10 +39,11 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install Build Dependencies
+      - name: Install Build Dependencies & VCPKG Libraries
         shell: pwsh
         run: |
           choco install llvm yasm -y
+          vcpkg install --triplet x64-windows-static libvpx libyuv opus
 
       - name: Compile OyazDesk
         shell: bash
@@ -51,7 +54,8 @@ jobs:
         shell: bash
         run: |
           mkdir -p output
-          cp target/release/rustdesk.exe output/OyazDesk.exe 2>/dev/null || cp target/x86_64-pc-windows-msvc/release/rustdesk.exe output/OyazDesk.exe
+          find . -type f -name "rustdesk.exe" -exec cp {} output/OyazDesk.exe \;
+          ls -lh output/
 
       - name: Upload OyazDesk Executable
         uses: actions/upload-artifact@v4
