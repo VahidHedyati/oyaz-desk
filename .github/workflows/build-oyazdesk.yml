@@ -24,20 +24,29 @@ jobs:
         run: |
           echo "Injecting Oyaz Custom Configurations & Logos..."
           # ۱. تنظیمات سرور و کلید عمومی
-          cp branding/config.rs libs/hbb_common/src/config.rs
+          cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
 
           # ۲. آیکون پنجره و فایل اجرایی ویندوز
-          cp branding/icon.ico res/icon.ico
+          cp branding/icon.ico res/icon.ico 2>/dev/null || true
           mkdir -p flutter/windows/runner/resources
-          cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico
+          cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
 
-          # ۳. جایگزینی لوگوهای رابط کاربری فلاتر با نشان ایاز
-          cp branding/logo.png flutter/assets/logo.png
-          cp branding/logo.png flutter/assets/logo_light.png
-          cp branding/logo.png flutter/assets/logo_dark.png
-          cp branding/logo.png flutter/assets/icon.png
-          cp branding/logo.svg flutter/assets/logo.svg 2>/dev/null || true
-          cp branding/logo.svg flutter/assets/icon.svg 2>/dev/null || true
+          # ۳. جایگزینی ایمن تمام لوگوهای رابط کاربری فلاتر با نشان ایاز
+          if [ -f "branding/logo.png" ]; then
+            echo "Found branding/logo.png, injecting..."
+            cp -f branding/logo.png flutter/assets/logo.png
+            cp -f branding/logo.png flutter/assets/logo_light.png
+            cp -f branding/logo.png flutter/assets/logo_dark.png
+            cp -f branding/logo.png flutter/assets/icon.png
+          else
+            echo "branding/logo.png not found, continuing safely."
+          fi
+
+          if [ -f "branding/logo.svg" ]; then
+            echo "Found branding/logo.svg, injecting..."
+            cp -f branding/logo.svg flutter/assets/logo.svg
+            cp -f branding/logo.svg flutter/assets/icon.svg
+          fi
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
