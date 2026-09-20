@@ -23,7 +23,8 @@ jobs:
           echo "Injecting Oyaz Custom Configurations..."
           cp branding/config.rs libs/hbb_common/src/config.rs
           cp branding/icon.ico res/icon.ico
-          cp branding/icon.ico windows/runner/resources/app_icon.ico
+          mkdir -p flutter/windows/runner/resources
+          cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
