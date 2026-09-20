@@ -19,14 +19,25 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Inject Oyaz Branding & Config
+      - name: Inject Oyaz Branding & Assets
         shell: bash
         run: |
-          echo "Injecting Oyaz Custom Configurations..."
+          echo "Injecting Oyaz Custom Configurations & Logos..."
+          # ۱. تنظیمات سرور و کلید عمومی
           cp branding/config.rs libs/hbb_common/src/config.rs
+
+          # ۲. آیکون پنجره و فایل اجرایی ویندوز
           cp branding/icon.ico res/icon.ico
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico
+
+          # ۳. جایگزینی لوگوهای رابط کاربری فلاتر با نشان ایاز
+          cp branding/logo.png flutter/assets/logo.png
+          cp branding/logo.png flutter/assets/logo_light.png
+          cp branding/logo.png flutter/assets/logo_dark.png
+          cp branding/logo.png flutter/assets/icon.png
+          cp branding/logo.svg flutter/assets/logo.svg 2>/dev/null || true
+          cp branding/logo.svg flutter/assets/icon.svg 2>/dev/null || true
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -65,16 +76,22 @@ jobs:
         run: |
           python3 build.py --flutter
 
-      - name: Prepare Artifact
+      - name: Prepare Clean Single Exe Artifact
         shell: bash
         run: |
           mkdir -p output
-          find . -type f -name "rustdesk.exe" -exec cp {} output/OyazDesk.exe \;
-          find target/ -type f -name "*.exe" -exec cp {} output/ \; 2>/dev/null || true
+          PACKER=$(find . -type f -name "*portable_packer.exe" | head -n 1)
+          if [ -n "$PACKER" ]; then
+            echo "Packaging portable client from $PACKER"
+            cp "$PACKER" output/OyazDesk.exe
+          else
+            echo "Falling back to standalone executable"
+            find . -type f -name "rustdesk.exe" -exec cp {} output/OyazDesk.exe \;
+          fi
           ls -lh output/
 
       - name: Upload OyazDesk Executable
         uses: actions/upload-artifact@v4
         with:
           name: OyazDesk-v1.0-Windows-x64
-          path: output/
+          path: output/OyazDesk.exe

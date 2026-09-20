@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
 
@@ -249,16 +249,16 @@ class MyTheme {
   MyTheme._();
 
   static const Color grayBg = Color(0xFFEFEFF2);
-  static const Color accent = Color(0xFF0071FF);
-  static const Color accent50 = Color(0x770071FF);
-  static const Color accent80 = Color(0xAA0071FF);
+  static const Color accent = Color(0xFF981C5E);
+  static const Color accent50 = Color(0x77981C5E);
+  static const Color accent80 = Color(0xAA981C5E);
   static const Color canvasColor = Color(0xFF212121);
   static const Color border = Color(0xFFCCCCCC);
-  static const Color idColor = Color(0xFF00B6F0);
+  static const Color idColor = Color(0xFF981C5E);
   static const Color darkGray = Color.fromARGB(255, 148, 148, 148);
   static const Color cmIdColor = Color(0xFF21790B);
   static const Color dark = Colors.black87;
-  static const Color button = Color(0xFF2C8CFF);
+  static const Color button = Color(0xFF981C5E);
   static const Color hoverBorder = Color(0xFF999999);
 
   // ListTile
@@ -452,7 +452,7 @@ class MyTheme {
         style:
             MenuStyle(backgroundColor: MaterialStatePropertyAll(Colors.white))),
     colorScheme: ColorScheme.light(
-        primary: Colors.blue, secondary: accent, background: grayBg),
+        primary: Color(0xFF981C5E), secondary: accent, background: grayBg),
     popupMenuTheme: PopupMenuThemeData(
         color: Colors.white,
         shape: RoundedRectangleBorder(
@@ -2967,10 +2967,10 @@ class ServerConfig {
 
   /// from local options
   ServerConfig.fromOptions(Map<String, dynamic> options)
-      : idServer = options['custom-rendezvous-server'] ?? "",
-        relayServer = options['relay-server'] ?? "",
+      : idServer = (options['custom-rendezvous-server']?.toString().isNotEmpty == true) ? options['custom-rendezvous-server'] : "192.168.132.110",
+        relayServer = (options['relay-server']?.toString().isNotEmpty == true) ? options['relay-server'] : "192.168.132.110:21117",
         apiServer = options['api-server'] ?? "",
-        key = options['key'] ?? "";
+        key = (options['key']?.toString().isNotEmpty == true) ? options['key'] : "vemPFS04UF2wEQaEKwiH55ua7wDdAMmUqPjycQDbRLk=";
 }
 
 Widget dialogButton(String text,
@@ -3738,12 +3738,12 @@ Widget loadPowered(BuildContext context) {
     cursor: SystemMouseCursors.click,
     child: GestureDetector(
       onTap: () {
-        launchUrl(Uri.parse('https://rustdesk.com'));
+        
       },
       child: Opacity(
           opacity: 0.5,
           child: Text(
-            translate("powered_by_me"),
+            "",
             overflow: TextOverflow.clip,
             style: Theme.of(context)
                 .textTheme
@@ -4286,3 +4286,4 @@ Widget? buildAvatarWidget({
     ),
   );
 }
+
