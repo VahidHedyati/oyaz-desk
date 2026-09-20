@@ -39,12 +39,12 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install Build Dependencies & VCPKG
+      - name: Install Build Dependencies & Full VCPKG Codecs
         shell: pwsh
         run: |
           choco install llvm yasm -y
           cd C:\vcpkg
-          .\vcpkg.exe install --classic --triplet x64-windows-static opus
+          .\vcpkg.exe install --classic --triplet x64-windows-static libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static aom:x64-windows-static
 
       - name: Compile OyazDesk
         shell: bash
