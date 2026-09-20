@@ -39,12 +39,25 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install Build Dependencies & Full VCPKG Codecs
+      - name: Install Build Dependencies & VCPKG Codecs
         shell: pwsh
         run: |
           choco install llvm yasm -y
           cd C:\vcpkg
           .\vcpkg.exe install --classic --triplet x64-windows-static libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static aom:x64-windows-static
+
+      - name: Generate Flutter Rust Bridge
+        shell: pwsh
+        run: |
+          $env:LIBCLANG_PATH = "C:\Program Files\LLVM\bin"
+          cargo install cargo-expand --version 1.0.95 --locked
+          cargo install flutter_rust_bridge_codegen --version 1.80.1 --features "uuid" --locked
+          cd flutter
+          flutter pub get
+          cd ..
+          New-Item -ItemType Directory -Force -Path flutter/macos/Runner, flutter/ios/Runner
+          flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart --c-output ./flutter/macos/Runner/bridge_generated.h
+          Copy-Item ./flutter/macos/Runner/bridge_generated.h ./flutter/ios/Runner/bridge_generated.h
 
       - name: Compile OyazDesk
         shell: bash
@@ -56,10 +69,11 @@ jobs:
         run: |
           mkdir -p output
           find . -type f -name "rustdesk.exe" -exec cp {} output/OyazDesk.exe \;
+          find target/ -type f -name "*.exe" -exec cp {} output/ \; 2>/dev/null || true
           ls -lh output/
 
       - name: Upload OyazDesk Executable
         uses: actions/upload-artifact@v4
         with:
           name: OyazDesk-v1.0-Windows-x64
-          path: output/OyazDesk.exe
+          path: output/
