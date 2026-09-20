@@ -43,7 +43,8 @@ jobs:
         shell: pwsh
         run: |
           choco install llvm yasm -y
-          vcpkg install --triplet x64-windows-static libvpx libyuv opus
+          cd C:\vcpkg
+          .\vcpkg.exe install --triplet x64-windows-static libvpx libyuv opus --no-manifest
 
       - name: Compile OyazDesk
         shell: bash
