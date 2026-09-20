@@ -1,0 +1,59 @@
+name: Build OyazDesk Client
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-windows:
+    name: Build Windows x64 Portable
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Inject Oyaz Branding & Config
+        shell: bash
+        run: |
+          echo "Injecting Oyaz Custom Configurations..."
+          cp branding/config.rs libs/hbb_common/src/config.rs
+          cp branding/icon.ico res/icon.ico
+          cp branding/icon.ico windows/runner/resources/app_icon.ico
+
+      - name: Setup Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Install Build Dependencies
+        shell: pwsh
+        run: |
+          choco install llvm yasm -y
+
+      - name: Compile OyazDesk
+        shell: bash
+        run: |
+          python3 build.py --flutter
+
+      - name: Prepare Artifact
+        shell: bash
+        run: |
+          mkdir -p output
+          cp target/release/rustdesk.exe output/OyazDesk.exe 2>/dev/null || cp target/x86_64-pc-windows-msvc/release/rustdesk.exe output/OyazDesk.exe
+
+      - name: Upload OyazDesk Executable
+        uses: actions/upload-artifact@v4
+        with:
+          name: OyazDesk-v1.0-Windows-x64
+          path: output/OyazDesk.exe
