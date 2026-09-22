@@ -1,4 +1,4 @@
-use std::{
+﻿use std::{
     collections::HashMap,
     future::Future,
     net::SocketAddr,
@@ -2495,7 +2495,7 @@ pub fn is_udp_disabled() -> bool {
 
 /// Run KCP with its congestion window (nc=0) instead of the turbo profile it has always shipped.
 ///
-/// Opt-in: which profile wins depends on why packets are lost — nc=1 deepens real congestion,
+/// Opt-in: which profile wins depends on why packets are lost â€” nc=1 deepens real congestion,
 /// while nc=0 reads random loss as congestion and its RTO backoff drops cwnd to 1. Undecidable
 /// without a shaped link, so keep what users run today.
 #[inline]
@@ -3424,3 +3424,4 @@ mod tests {
         assert!(hbb_common::timeout(1_000, test_bind_ipv6()).await.is_ok());
     }
 }
+

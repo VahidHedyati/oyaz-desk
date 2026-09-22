@@ -1,4 +1,4 @@
-use hbb_common::{
+﻿use hbb_common::{
     bytes::Bytes,
     log,
     tokio::{
@@ -17,7 +17,7 @@ use std::sync::{Arc, Mutex};
 pub const INITIAL_WINDOW: u32 = 64 * 1024;
 /// Also on the wire and fixed forever: the window a `data` frame costs at
 /// minimum, whatever its length. It bounds the per-frame bookkeeping a peer
-/// can make us hold — 1-byte frames would otherwise cost it one byte and us
+/// can make us hold â€” 1-byte frames would otherwise cost it one byte and us
 /// a queue entry.
 pub const MIN_FRAME_CHARGE: u32 = 64;
 pub const CHANNEL_WINDOW: u32 = 256 * 1024;
@@ -54,7 +54,7 @@ pub fn charge(len: usize) -> u32 {
 
 /// Receiver-side accounting: the credit the peer still has, and what we have
 /// drained to the local socket since the last `window_update`. Both are
-/// bounded — a cumulative counter would wear out on a long transfer.
+/// bounded â€” a cumulative counter would wear out on a long transfer.
 pub struct RecvWindow {
     remaining: u32,
     drained_since_update: u32,
@@ -119,7 +119,7 @@ impl SendCredit {
     }
 
     /// `max` must be at least `MIN_FRAME_CHARGE` (`MAX_FRAME` is), and the
-    /// caller pays `charge(bytes_read)` and refunds the rest — so this parks
+    /// caller pays `charge(bytes_read)` and refunds the rest â€” so this parks
     /// until a whole minimum charge is available rather than at zero.
     pub async fn take(&self, max: usize) -> usize {
         debug_assert!(max >= MIN_FRAME_CHARGE as usize);
@@ -358,7 +358,7 @@ async fn relay_tunnel_to_socket<W: AsyncWrite + Unpin>(
 
 /// Runs both halves as independent tasks; whichever ends first cancels the
 /// other. Sends `close` once, after the last data, and only when the channel
-/// ended for a local reason — the peer's own `close` is never echoed.
+/// ended for a local reason â€” the peer's own `close` is never echoed.
 /// `teardown` is the tunnel closing under the channel: it cancels both halves
 /// even when they are parked on the socket, where dropping the inbound sender
 /// reaches neither. It is a level, so a channel opened as the tunnel closes,
@@ -1737,3 +1737,4 @@ mod tests {
         }
     }
 }
+

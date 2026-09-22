@@ -1,4 +1,4 @@
-use super::*;
+﻿use super::*;
 use hbb_common::{allow_err, anyhow};
 use base::platform::linux::DISTRO;
 use scrap::{
@@ -338,7 +338,7 @@ fn drm_desktop_rect_for_uinput() -> Option<(i32, i32, i32, i32)> {
 /// Set the uinput absolute-pointer range to the whole logical desktop so the compositor maps
 /// injected coordinates 1:1 instead of stretching a single-monitor range across all outputs. The
 /// PipeWire path does this inline in `check_init`; the DRM path bypasses check_init so it must do it
-/// too, otherwise on a multi-monitor host the injected pointer lands on the wrong output — and the
+/// too, otherwise on a multi-monitor host the injected pointer lands on the wrong output â€” and the
 /// hardware cursor, which lives on whichever CRTC the pointer is over, never appears on the captured
 /// CRTC (the "cursor not visible" symptom). Reads the layout from the Wayland outputs, so it is
 /// independent of the capture backend.
@@ -641,7 +641,7 @@ pub fn clear() {
 /// that cannot be captured can fall through to PipeWire for THAT display. `ensure_inited` short-circuits
 /// to the DRM branch whenever DRM is globally available, so it never runs `check_init`; this helper
 /// drives the same async portal ScreenCast init directly (mirroring `ensure_inited`'s pattern). Needed
-/// because `is_available()` is a GLOBAL verdict — it stays true for the still-working DRM outputs — so
+/// because `is_available()` is a GLOBAL verdict â€” it stays true for the still-working DRM outputs â€” so
 /// without a per-display fallback a single failed/demoted DRM display would restart-loop the video
 /// service instead of degrading to PipeWire only for itself.
 #[cfg(feature = "drm")]
@@ -658,7 +658,7 @@ pub(super) fn get_capturer_for_display(
     }
     // DRM/KMS capture path: build the capturer straight from the service `_drm` stream, bypassing
     // the PipeWire CAP_DISPLAY_INFO machinery entirely. `is_available()` is a GLOBAL verdict, so a
-    // per-display DRM failure (an ungrabbable/demoted CRTC, or — after the phase-2 split — a
+    // per-display DRM failure (an ungrabbable/demoted CRTC, or â€” after the phase-2 split â€” a
     // render-node-absent seat or a convert failure on the unprivileged side) must NOT propagate out
     // and restart-loop this per-display video service. Instead fall THROUGH to PipeWire for just this
     // display; the other DRM outputs keep streaming over DRM.
@@ -818,3 +818,4 @@ pub fn common_get_error() -> String {
     }
     return "".to_owned();
 }
+

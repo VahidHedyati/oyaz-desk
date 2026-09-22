@@ -1,4 +1,4 @@
-use super::HbbHttpResponse;
+﻿use super::HbbHttpResponse;
 use crate::hbbs_http::create_http_client_with_url;
 use hbb_common::{config::LocalConfig, log, ResultType};
 use serde_derive::{Deserialize, Serialize};
@@ -398,3 +398,4 @@ impl OidcSession {
         OIDC_SESSION.read().unwrap().get_result_()
     }
 }
+

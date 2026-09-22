@@ -1,4 +1,4 @@
-#[cfg(not(target_os = "ios"))]
+﻿#[cfg(not(target_os = "ios"))]
 use hbb_common::whoami;
 use hbb_common::{
     allow_err,
@@ -350,3 +350,4 @@ async fn handle_received_peers(mut rx: UnboundedReceiver<config::DiscoveryPeer>)
     crate::flutter_ffi::main_load_lan_peers();
     Ok(())
 }
+

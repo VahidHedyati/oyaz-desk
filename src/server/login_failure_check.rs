@@ -1,4 +1,4 @@
-use crate::AlarmAuditType;
+﻿use crate::AlarmAuditType;
 use hbb_common::get_time;
 #[cfg(target_os = "windows")]
 use hbb_common::tokio::sync::{Mutex as TokioMutex, OwnedMutexGuard};
@@ -229,3 +229,4 @@ mod tests {
         clear_os_credential_failure_state(FailureScope::TerminalOsLogin);
     }
 }
+

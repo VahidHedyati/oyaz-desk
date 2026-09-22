@@ -1,4 +1,4 @@
-use super::input_service::set_clipboard_for_paste_sync;
+﻿use super::input_service::set_clipboard_for_paste_sync;
 use crate::uinput::service::{can_input_via_keysym, char_to_keysym, map_key};
 use dbus::{blocking::SyncConnection, Path};
 use enigo::{Key, KeyboardControllable, MouseButton, MouseControllable};
@@ -161,7 +161,7 @@ pub mod client {
                 }
             } else {
                 handle_key(true, key.clone(), self.conn.clone(), &self.session)?;
-                // Update modifier state only after successful send —
+                // Update modifier state only after successful send â€”
                 // if handle_key fails, we don't want stale "pressed" state
                 // affecting subsequent key event decisions.
                 self.modifier_state.update(&key, true);
@@ -642,3 +642,4 @@ pub mod client {
         );
     }
 }
+

@@ -1,4 +1,4 @@
-#[cfg(target_os = "linux")]
+﻿#[cfg(target_os = "linux")]
 use super::ipc_auth::active_uid;
 use crate::ipc::{connect, Data};
 use hbb_common::{config, log, ResultType};
@@ -1027,3 +1027,4 @@ mod tests {
         ));
     }
 }
+

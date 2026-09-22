@@ -1,4 +1,4 @@
-use super::*;
+﻿use super::*;
 use scrap::codec::{Quality, BR_BALANCED, BR_BEST, BR_SPEED};
 use std::{
     collections::VecDeque,
@@ -1021,3 +1021,4 @@ mod tests {
     mod smoke;
     mod startup;
 }
+

@@ -1,4 +1,4 @@
-use super::{send_f32, GenericService};
+﻿use super::{send_f32, GenericService};
 use hbb_common::{
     anyhow::{bail, Context, Result},
     log,
@@ -298,3 +298,4 @@ pub(super) fn start_capture_encoder(
 #[cfg(test)]
 #[path = "audio_capture_queue_tests.rs"]
 mod tests;
+

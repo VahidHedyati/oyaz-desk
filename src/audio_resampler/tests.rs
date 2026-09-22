@@ -1,4 +1,4 @@
-use super::{AudioResampler, AudioResamplerConfig, FixedFrameAudioResampler};
+﻿use super::{AudioResampler, AudioResamplerConfig, FixedFrameAudioResampler};
 
 const INPUT_RATE: u32 = 24_000;
 const OUTPUT_RATE: u32 = 48_000;
@@ -176,3 +176,4 @@ fn sender_downsampling_preserves_packet_continuity() {
         "sender packet boundary residual {residual} exceeded the tone curvature"
     );
 }
+

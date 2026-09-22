@@ -24,13 +24,16 @@ jobs:
         run: |
           echo "Configuring OyazDesk native parameters..."
           
-          # ۱. تنظیمات سرور و آیکون‌ها
+          # ۱. تنظیمات هسته سرور و تغییر نام APP_NAME
+          sed -i 's/pub const APP_NAME: &str = "rustdesk";/pub const APP_NAME: &str = "OyazDesk";/g' branding/config.rs 2>/dev/null || true
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
+          sed -i 's/pub const APP_NAME: &str = "rustdesk";/pub const APP_NAME: &str = "OyazDesk";/g' libs/hbb_common/src/config.rs 2>/dev/null || true
+
+          # ۲. تنظیم آیکون‌ها و لوگوی جدید
           cp branding/icon.ico res/icon.ico 2>/dev/null || true
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
 
-          # ۲. تزریق نشان‌های بصری
           if [ -f "branding/logo.png" ]; then
             cp -f branding/logo.png flutter/assets/logo.png
             cp -f branding/logo.png flutter/assets/logo_light.png
@@ -42,23 +45,23 @@ jobs:
             cp -f branding/logo.svg flutter/assets/icon.svg
           fi
 
-          # ۳. یکسان‌سازی نام باینری در فلاتر و ویندوز
+          # ۳. یکسان‌سازی نام باینری و هدف اجرای پکر پرتابل
           sed -i 's/set(BINARY_NAME "rustdesk")/set(BINARY_NAME "OyazDesk")/g' flutter/windows/CMakeLists.txt 2>/dev/null || true
           sed -i 's/L"rustdesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
           sed -i 's/L"RustDesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
           sed -i 's/rustdesk.exe/OyazDesk.exe/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
           sed -i 's/RustDesk/OyazDesk/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
+          
+          # اصلاح نام هدف اجرایی در کدهای پکر پرتابل
+          find src/ libs/ -type f -name "*.rs" -exec sed -i 's/"rustdesk.exe"/"OyazDesk.exe"/g' {} + 2>/dev/null || true
 
-          # ۴. اصلاح متادیتا و کپی‌رایت سازنده
+          # ۴. متادیتا و کپی‌رایت سازنده
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/RustDesk Remote Desktop/OyazDesk Remote Support/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Purslane Tech Pte. Ltd./Vahid Hedyati/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Copyright © 2026 Purslane Tech Pte. Ltd./Copyright © 2026 Vahid Hedyati (vahid.hedyati.ir)/g' {} + 2>/dev/null || true
-
-          # ۵. اصلاح نام سرویس ویندوز برای UAC
           find src/ -type f -name "*.rs" -exec sed -i 's/"RustDesk Service"/"OyazDesk Remote Service"/g' {} + 2>/dev/null || true
-          find src/ -type f -name "*.rs" -exec sed -i 's/"RustDesk"/"OyazDesk"/g' {} + 2>/dev/null || true
 
-          # ۶. اصلاح پیوندها به سایت شخصی
+          # ۵. اصلاح پیوندها به سایت شخصی
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com/privacy.html|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://github.com/rustdesk/rustdesk|https://github.com/VahidHedyati/oyaz-desk|g' {} + 2>/dev/null || true

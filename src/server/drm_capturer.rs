@@ -1,4 +1,4 @@
-// Unprivileged consumer of the root `--service`'s DRM/KMS capture stream: the service does the
+﻿// Unprivileged consumer of the root `--service`'s DRM/KMS capture stream: the service does the
 // privileged export (open + grab the scanout dma-buf fd), the EGL detile / RGBA convert runs here.
 
 use crate::ipc::{connect_drm, Data, DrmDisplayInfo};
@@ -1074,7 +1074,7 @@ pub(crate) enum Availability {
     Unsettled,
 }
 
-/// MAY BLOCK for seconds: never a routing gate, and never on the login request path — that path
+/// MAY BLOCK for seconds: never a routing gate, and never on the login request path â€” that path
 /// reads `availability_cached`. This blocking form serves the capture-side callers through
 /// `is_available`, where waiting out a settle is acceptable.
 fn availability() -> Availability {
@@ -1521,7 +1521,7 @@ fn augment_with_wayland_geometry_from(
         return infos;
     }
     // One connector against one output is the origin-only case: the lone output can still sit at
-    // a non-zero origin this side cannot see, but it keeps the scale-1 convention — a single
+    // a non-zero origin this side cannot see, but it keeps the scale-1 convention â€” a single
     // display is advertised at physical size (see `logical_rects_of`), so its logical size must
     // not be adopted. More connectors than the one output is an inconsistent snapshot, and the
     // layout-order fallback in `assign_wayland_outputs` would plant that origin on a guess.
@@ -2391,3 +2391,4 @@ mod drm_capturer_tests {
         assert!(demote_cooldown(5) + burn > Duration::from_secs(8 * 60));
     }
 }
+

@@ -1,4 +1,4 @@
-//! Guards against tuning the controller to the simulator: the CI bounds applied
+﻿//! Guards against tuning the controller to the simulator: the CI bounds applied
 //! to seeds that never took part in setting them, and a sweep of the scenario
 //! parameters.  Both are `#[ignore]`d: they take a few seconds and are meant for
 //! anyone changing a controller constant or a bound.
@@ -178,3 +178,4 @@ fn sensitivity() {
         );
     }
 }
+

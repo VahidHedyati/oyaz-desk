@@ -1,4 +1,4 @@
-use std::sync::{Arc, RwLock};
+﻿use std::sync::{Arc, RwLock};
 
 use crate::client::*;
 use crate::port_forward_mux::{Claim, Tunnel, CHANNEL_WINDOW};
@@ -822,7 +822,7 @@ mod tests {
         // option2bool's fallback branch is also "on unless N", so the value
         // assertions below would pass for a prefixless key too. The `enable-`
         // prefix is what actually guarantees the default, and renaming the key
-        // to an `allow-` one would silently flip it — pin the prefix itself.
+        // to an `allow-` one would silently flip it â€” pin the prefix itself.
         assert!(keys::OPTION_ENABLE_PORT_FORWARD_MUX.starts_with("enable-"));
         assert!(option2bool(keys::OPTION_ENABLE_PORT_FORWARD_MUX, ""));
         assert!(option2bool(keys::OPTION_ENABLE_PORT_FORWARD_MUX, "Y"));
@@ -853,3 +853,4 @@ mod tests {
         });
     }
 }
+

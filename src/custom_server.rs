@@ -1,4 +1,4 @@
-use hbb_common::{
+﻿use hbb_common::{
     bail,
     base64::{
         engine::general_purpose::{URL_SAFE, URL_SAFE_NO_PAD},
@@ -118,7 +118,7 @@ mod test {
 
     #[test]
     fn test_filename_license_string() {
-        assert!(get_custom_server_from_string("rustdesk.exe").is_err());
+        assert!(get_custom_server_from_string("OyazDesk.exe").is_err());
         assert!(get_custom_server_from_string("rustdesk").is_err());
         assert_eq!(
             get_custom_server_from_string("rustdesk-host=server.example.net.exe").unwrap(),
@@ -233,3 +233,4 @@ mod test {
                 .unwrap(), lic);
     }
 }
+

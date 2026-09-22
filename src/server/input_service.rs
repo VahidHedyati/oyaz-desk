@@ -1,4 +1,4 @@
-#[cfg(target_os = "linux")]
+﻿#[cfg(target_os = "linux")]
 use super::rdp_input::client::{RdpInputKeyboard, RdpInputMouse};
 use super::*;
 use crate::input::*;
@@ -1754,7 +1754,7 @@ fn process_seq(en: &mut Enigo, sequence: &str) {
 }
 
 /// Delay in milliseconds to wait for clipboard to sync on Wayland.
-/// This is an empirical value — Wayland provides no callback or event to confirm
+/// This is an empirical value â€” Wayland provides no callback or event to confirm
 /// clipboard content has been received by the compositor. Under heavy system load,
 /// this delay may be insufficient, but there is no reliable alternative mechanism.
 #[cfg(target_os = "linux")]
@@ -1921,7 +1921,7 @@ fn input_text_via_clipboard_server(en: &mut Enigo, text: &str) {
     en.key_up(Key::Shift);
 
     // Brief delay to allow the target application to process the paste event.
-    // Empirical value — no reliable synchronization mechanism exists on Wayland.
+    // Empirical value â€” no reliable synchronization mechanism exists on Wayland.
     std::thread::sleep(std::time::Duration::from_millis(20));
 }
 
@@ -1963,7 +1963,7 @@ fn is_function_key(ck: &EnumOrUnknown<ControlKey>) -> bool {
 /// Used to detect hotkey combinations like Ctrl+C, Alt+Tab, etc.
 ///
 /// Note: Shift is intentionally NOT checked here. Shift+character produces a different
-/// character (e.g., Shift+a → 'A'), which is normal text input, not a hotkey.
+/// character (e.g., Shift+a â†’ 'A'), which is normal text input, not a hotkey.
 /// Shift is only relevant as a hotkey modifier when combined with Ctrl/Alt/Meta
 /// (e.g., Ctrl+Shift+Z), in which case this function already returns true via Ctrl.
 #[cfg(target_os = "linux")]
@@ -1992,10 +1992,10 @@ fn release_shift_for_char_input(en: &mut Enigo) {
     }
 
     // In translate mode, the client has already converted the keystroke to a character
-    // (e.g., Shift+a → 'A'). We release Shift here so the server inputs the character
+    // (e.g., Shift+a â†’ 'A'). We release Shift here so the server inputs the character
     // directly without Shift affecting the result.
     //
-    // Shift is intentionally NOT restored after input — the client will send an explicit
+    // Shift is intentionally NOT restored after input â€” the client will send an explicit
     // Shift key_up event when the user physically releases Shift. Restoring it here would
     // cause a brief Shift re-press that could interfere with the next input event.
 
@@ -2533,3 +2533,4 @@ lazy_static::lazy_static! {
         (ControlKey::Delete, true),
     ].iter().map(|(a, b)| (a.value(), b.clone())).collect();
 }
+

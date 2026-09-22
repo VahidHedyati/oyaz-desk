@@ -1,4 +1,4 @@
-use crate::{
+﻿use crate::{
     ipc::{self, new_listener, Connection, Data, DataPortableService, IPC_TOKEN_LEN},
     platform::{
         set_path_permission, set_path_permission_for_portable_service_shmem_dir,
@@ -1611,3 +1611,4 @@ mod tests {
         assert!(is_valid_capture_frame_length(ADDR_CAPTURE_FRAME + 16, 16));
     }
 }
+

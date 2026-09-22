@@ -1,4 +1,4 @@
-use super::{AudioHandler, Instant, Ordering, ResultType};
+﻿use super::{AudioHandler, Instant, Ordering, ResultType};
 use hbb_common::log;
 
 impl AudioHandler {
@@ -61,3 +61,4 @@ impl AudioHandler {
         Some(false)
     }
 }
+

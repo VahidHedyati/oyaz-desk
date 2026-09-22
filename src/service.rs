@@ -1,4 +1,4 @@
-use librustdesk::*;
+﻿use librustdesk::*;
 
 #[cfg(not(target_os = "macos"))]
 fn main() {}
@@ -17,3 +17,4 @@ fn main() {
     hbb_common::init_log(false, "service");
     crate::start_os_service();
 }
+

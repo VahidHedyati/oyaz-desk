@@ -1,4 +1,4 @@
-use hbb_common::anyhow::{bail, Result};
+﻿use hbb_common::anyhow::{bail, Result};
 
 const STEREO_CHANNELS: usize = 2;
 
@@ -142,3 +142,4 @@ mod tests {
         assert_eq!(output_position, input.len());
     }
 }
+

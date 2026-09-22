@@ -1,4 +1,4 @@
-#[cfg(not(any(target_os = "android", target_os = "ios")))]
+﻿#[cfg(not(any(target_os = "android", target_os = "ios")))]
 use crate::ipc::Connection;
 #[cfg(not(any(target_os = "ios")))]
 use crate::ipc::{self, Data};
@@ -73,7 +73,7 @@ static MAX_VALIDATED_FILES: std::sync::OnceLock<usize> = std::sync::OnceLock::ne
 /// - If the option is set to `0`, `DEFAULT_MAX_VALIDATED_FILES` (10,000) is used as a safe upper bound.
 /// - If the option is unset, negative, or non-integer,
 ///   `usize::MAX` is used to represent "no limit" for backward compatibility with older versions
-///   that did not enforce any file‑count restriction.
+///   that did not enforce any fileâ€‘count restriction.
 ///   (Note: negative values are not valid for `usize` and will cause parsing to fail.)
 ///
 /// Unit: number of files.
@@ -1891,3 +1891,4 @@ mod tests {
         let _ = fs::remove_dir_all(&base_dir);
     }
 }
+

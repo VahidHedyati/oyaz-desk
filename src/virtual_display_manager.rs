@@ -1,4 +1,4 @@
-use base::platform::windows::is_windows_version_or_greater;
+﻿use base::platform::windows::is_windows_version_or_greater;
 use hbb_common::{bail, ResultType};
 
 // This string is defined here.
@@ -924,3 +924,4 @@ mod windows {
         display_drivers
     }
 }
+

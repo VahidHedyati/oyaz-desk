@@ -1,4 +1,4 @@
-use super::*;
+﻿use super::*;
 
 fn abr_session() -> VideoQoS {
     let mut qos = stable_qos();
@@ -491,3 +491,4 @@ fn closing_the_latest_newcomer_keeps_an_earlier_newcomers_guard() {
         "viewer 2 is still inside its own start-up window"
     );
 }
+

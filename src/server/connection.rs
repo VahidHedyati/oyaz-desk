@@ -1,4 +1,4 @@
-#[cfg(target_os = "windows")]
+﻿#[cfg(target_os = "windows")]
 use super::login_failure_check::try_acquire_os_credential_login_gate;
 use super::login_failure_check::{
     evaluate_os_credential_policy, record_os_credential_failure, FailureScope,
@@ -7925,3 +7925,4 @@ mod test {
         assert!(!replaced_by(&conn(3, remote, key(7, "other")), 2, &mine));
     }
 }
+

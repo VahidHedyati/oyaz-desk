@@ -1,4 +1,4 @@
-use std::{
+﻿use std::{
     collections::{hash_map::RandomState, HashMap, VecDeque},
     hash::BuildHasher,
     net::SocketAddr,
@@ -865,7 +865,7 @@ impl RendezvousMediator {
     ///
     /// Awaited inline on the punch-reply path, which only holds because everything here is local
     /// (pc + keygen + SDP; trickle means the answer carries no candidates). Keep network I/O out
-    /// — connection setup belongs in the detached task below.
+    /// â€” connection setup belongs in the detached task below.
     async fn spawn_webrtc_answerer(
         &self,
         ph: &PunchHole,
@@ -902,7 +902,7 @@ impl RendezvousMediator {
         // Bounded: how many candidates arrive is the sender's choice, while draining one costs a
         // JSON parse and the ICE agent's lock, so an unbounded queue lets whoever can reach this
         // session's route grow it without limit inside a long-lived service process. A full queue
-        // drops the newest candidate, and the controller re-sends it once — the digests beside the
+        // drops the newest candidate, and the controller re-sends it once â€” the digests beside the
         // sender are what keep that re-send from spending a slot of its own.
         let (remote_ice_tx, mut remote_ice_rx) = mpsc::channel::<String>(MAX_PENDING_REMOTE_ICE);
         let own_ice_tx = remote_ice_tx.clone();
@@ -999,7 +999,7 @@ impl RendezvousMediator {
             let result = stream.wait_connected(CONNECT_TIMEOUT).await;
             // Only evict our own route. The key is the offer's DTLS fingerprint, identical across
             // the controller's punch retries, so a retry that built a fresh answerer has already
-            // replaced this entry — removing it blindly would delete the live session's sender and
+            // replaced this entry â€” removing it blindly would delete the live session's sender and
             // leave it receiving no candidates at all.
             {
                 let mut txs = WEBRTC_ICE_TXS.lock().await;
@@ -1029,7 +1029,7 @@ impl RendezvousMediator {
             drop(slot);
             // create_tcp_connection takes ownership of the stream; keep a handle to close the pc
             // once the session returns. It runs the whole session and returns Ok on normal end,
-            // Err on setup failure — either way the pc must be closed, else it lingers forever in
+            // Err on setup failure â€” either way the pc must be closed, else it lingers forever in
             // SESSIONS (its state handler only fires on a terminal ICE state, which a cleanly
             // closed session may never reach) leaking the pc, channels, and socket fds.
             let stream_for_cleanup = stream.clone();
@@ -1074,7 +1074,7 @@ impl RendezvousMediator {
         // No enable-webrtc check here: it is LocalConfig, which the UI process writes and never
         // syncs over IPC, so this (server) process would read the private-server default of "N"
         // and refuse to answer in exactly the self-hosted deployments the transport is for.
-        // A proxy still rules it out — ICE would bypass it and leak the real IP.
+        // A proxy still rules it out â€” ICE would bypass it and leak the real IP.
         let webrtc_viable = !ph.webrtc_sdp_offer.is_empty()
             && !Config::is_proxy()
             && (!webrtc_relay_only || WebRTCStream::has_turn_server());
@@ -1163,7 +1163,7 @@ impl RendezvousMediator {
             // Return the answer over its own short-lived TCP connection rather than the mediator
             // channel: that channel is UDP by default, and hbbs applies UDP-punch semantics
             // (source-address observation) to a PunchHoleSent that arrives on it. No TCP punch
-            // is made — the controller keeps its request socket for trickled ICE.
+            // is made â€” the controller keeps its request socket for trickled ICE.
             let mut msg_out = Message::new();
             msg_out.set_punch_hole_sent(msg_punch);
             let mut socket = connect_tcp(&*self.host, CONNECT_TIMEOUT).await?;
@@ -2116,3 +2116,4 @@ mod tests {
         assert!(AnswererSlot::take().is_some());
     }
 }
+

@@ -1,4 +1,4 @@
-use super::{
+﻿use super::{
     installer_shell::{
         get_system_executable, path_for_cmd_assignment, path_for_cmd_environment,
         run_elevated_and_wait, trusted_install_environment,
@@ -286,3 +286,4 @@ mod tests {
             .expect("native verifier should run")
     }
 }
+

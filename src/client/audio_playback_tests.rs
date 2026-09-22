@@ -1,4 +1,4 @@
-use super::{
+﻿use super::{
     AudioPlaybackConfig, AudioPlaybackError, AudioPlaybackRecovery, AudioPlaybackStatus,
     AudioPlaybackWriter,
 };
@@ -260,3 +260,4 @@ fn contention_reporting_is_independent_between_playbacks() {
         assert_eq!(status.contentions.load(Ordering::Relaxed), 1);
     }
 }
+

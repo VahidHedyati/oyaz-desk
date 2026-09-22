@@ -1,4 +1,4 @@
-use super::{wide_string, ResultType};
+﻿use super::{wide_string, ResultType};
 use hbb_common::{
     anyhow::anyhow,
     bail,
@@ -298,3 +298,4 @@ mod tests {
         assert!(environment.contains(r#"set "PATH=C:\Win^Root\System32""#));
     }
 }
+
