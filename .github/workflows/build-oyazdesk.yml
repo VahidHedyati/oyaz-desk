@@ -102,18 +102,25 @@ jobs:
           Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
           Export-Certificate -Cert $cert -FilePath "output\VahidHedyati-RootCA.cer" | Out-Null
 
-          $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Select-Object -First 1).FullName
+          # انتخاب دقیق نسخه x64 ابزار SignTool
+          $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
+          if (-not $signtool) {
+            $signtool = (Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
+          }
+
           if ($signtool) {
+            Write-Host "Found 64-bit SignTool at: $signtool"
             Write-Host "Signing OyazDesk.exe with Publisher: Vahid Hedyati..."
             & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk.exe"
+          } else {
+            Write-Warning "x64 SignTool not found, skipping sign step."
           }
-          Remove-Item "output\temp_sign.pfx" -Force
+
+          Remove-Item "output\temp_sign.pfx" -Force -ErrorAction SilentlyContinue
           Get-ChildItem output\
 
       - name: Upload Signed OyazDesk
         uses: actions/upload-artifact@v4
         with:
           name: OyazDesk-v1.0-Windows-x64
-          path: |
-            output/OyazDesk.exe
-            output/VahidHedyati-RootCA.cer
+          path: output/
