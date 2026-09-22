@@ -19,33 +19,45 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Inject Vahid Hedyati Branding & Metadata
+      - name: Purge RustDesk References & Inject Vahid Hedyati Branding
         shell: bash
         run: |
-          echo "Injecting Developer & Project Metadata..."
-          # ۱. تنظیمات سرور و کلید عمومی
+          echo "Starting Comprehensive White-labeling..."
+          
+          # ۱. تنظیمات سرور و آیکون‌ها
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
-
-          # ۲. آیکون و متادیتای اختصاصی ویندوز
           cp branding/icon.ico res/icon.ico 2>/dev/null || true
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
-          if [ -f "branding/win_res.rc" ]; then
-            cp -f branding/win_res.rc res/win_res.rc
-          fi
 
-          # ۳. تزریق نشان‌های بصری
+          # ۲. تزریق لوگوهای ایاز
           if [ -f "branding/logo.png" ]; then
             cp -f branding/logo.png flutter/assets/logo.png
             cp -f branding/logo.png flutter/assets/logo_light.png
             cp -f branding/logo.png flutter/assets/logo_dark.png
             cp -f branding/logo.png flutter/assets/icon.png
           fi
-
           if [ -f "branding/logo.svg" ]; then
             cp -f branding/logo.svg flutter/assets/logo.svg
             cp -f branding/logo.svg flutter/assets/icon.svg
           fi
+
+          # ۳. پاک‌سازی تمام متادیتای باینری در فایل‌های Rust
+          find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/RustDesk Remote Desktop/OyazDesk Remote Support/g' {} + 2>/dev/null || true
+          find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Copyright © 2026 Purslane Tech Pte. Ltd./Copyright © 2026 Vahid Hedyati (vahid.hedyati.ir)/g' {} + 2>/dev/null || true
+          find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Purslane Tech Pte. Ltd./Vahid Hedyati/g' {} + 2>/dev/null || true
+          find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/res.set("ProductName", "RustDesk")/res.set("ProductName", "OyazDesk")/g' {} + 2>/dev/null || true
+          find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/rustdesk.exe/OyazDesk.exe/g' {} + 2>/dev/null || true
+
+          # ۴. پاک‌سازی تمام لینک‌ها و متون RustDesk در رابط کاربری فلاتر
+          find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com/privacy.html|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
+          find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com/docs|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
+          find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
+          find flutter/ -type f -name "*.dart" -exec sed -i 's|https://github.com/rustdesk/rustdesk|https://github.com/VahidHedyati/oyaz-desk|g' {} + 2>/dev/null || true
+          
+          # ۵. حذف کامل پیام "For faster connection, please set up your own server"
+          find flutter/ -type f \( -name "*.dart" -o -name "*.json" \) -exec sed -i 's|For faster connection, please set up your own server||g' {} + 2>/dev/null || true
+          find flutter/ -type f \( -name "*.dart" -o -name "*.json" \) -exec sed -i 's|setup_server_tip||g' {} + 2>/dev/null || true
 
       - name: Setup Rust Toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -102,18 +114,14 @@ jobs:
           Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
           Export-Certificate -Cert $cert -FilePath "output\VahidHedyati-RootCA.cer" | Out-Null
 
-          # انتخاب دقیق نسخه x64 ابزار SignTool
           $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           if (-not $signtool) {
             $signtool = (Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           }
 
           if ($signtool) {
-            Write-Host "Found 64-bit SignTool at: $signtool"
             Write-Host "Signing OyazDesk.exe with Publisher: Vahid Hedyati..."
             & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk.exe"
-          } else {
-            Write-Warning "x64 SignTool not found, skipping sign step."
           }
 
           Remove-Item "output\temp_sign.pfx" -Force -ErrorAction SilentlyContinue
