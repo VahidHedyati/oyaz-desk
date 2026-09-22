@@ -19,10 +19,10 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Comprehensive System & Service Rebranding
+      - name: Native OyazDesk Branding & Configuration
         shell: bash
         run: |
-          echo "Deep rebranding core service, installer and binaries to OyazDesk..."
+          echo "Configuring OyazDesk native parameters..."
           
           # ۱. تنظیمات سرور و آیکون‌ها
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
@@ -30,7 +30,7 @@ jobs:
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
 
-          # ۲. جایگزینی لوگوی جدید ایاز
+          # ۲. تزریق نشان‌های بصری
           if [ -f "branding/logo.png" ]; then
             cp -f branding/logo.png flutter/assets/logo.png
             cp -f branding/logo.png flutter/assets/logo_light.png
@@ -42,18 +42,23 @@ jobs:
             cp -f branding/logo.svg flutter/assets/icon.svg
           fi
 
-          # ۳. اصلاح هسته سرویس ویندوز، پیام UAC و مسیرهای رجیستری
-          find src/ libs/ -type f -name "*.rs" -exec sed -i 's/"RustDesk"/"OyazDesk"/g' {} + 2>/dev/null || true
-          find src/ libs/ -type f -name "*.rs" -exec sed -i 's/"RustDesk Service"/"OyazDesk Remote Service"/g' {} + 2>/dev/null || true
-          find src/ libs/ -type f -name "*.rs" -exec sed -i 's/"rustdesk"/"oyazdesk"/g' {} + 2>/dev/null || true
-          find src/ libs/ -type f -name "*.rs" -exec sed -i 's/rustdesk\.exe/OyazDesk\.exe/g' {} + 2>/dev/null || true
+          # ۳. یکسان‌سازی نام باینری در فلاتر و ویندوز
+          sed -i 's/set(BINARY_NAME "rustdesk")/set(BINARY_NAME "OyazDesk")/g' flutter/windows/CMakeLists.txt 2>/dev/null || true
+          sed -i 's/L"rustdesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
+          sed -i 's/L"RustDesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
+          sed -i 's/rustdesk.exe/OyazDesk.exe/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
+          sed -i 's/RustDesk/OyazDesk/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
 
-          # ۴. اصلاح نام در کنترل‌پنل، متادیتای بیلد و پکر
+          # ۴. اصلاح متادیتا و کپی‌رایت سازنده
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/RustDesk Remote Desktop/OyazDesk Remote Support/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Purslane Tech Pte. Ltd./Vahid Hedyati/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.rs" -o -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Copyright © 2026 Purslane Tech Pte. Ltd./Copyright © 2026 Vahid Hedyati (vahid.hedyati.ir)/g' {} + 2>/dev/null || true
 
-          # ۵. اصلاح لینک‌های وب‌سایت و مستندات
+          # ۵. اصلاح نام سرویس ویندوز برای UAC
+          find src/ -type f -name "*.rs" -exec sed -i 's/"RustDesk Service"/"OyazDesk Remote Service"/g' {} + 2>/dev/null || true
+          find src/ -type f -name "*.rs" -exec sed -i 's/"RustDesk"/"OyazDesk"/g' {} + 2>/dev/null || true
+
+          # ۶. اصلاح پیوندها به سایت شخصی
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com/privacy.html|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://github.com/rustdesk/rustdesk|https://github.com/VahidHedyati/oyaz-desk|g' {} + 2>/dev/null || true
@@ -95,21 +100,20 @@ jobs:
         run: |
           python3 build.py --flutter
 
-      - name: Prepare, Rename Payloads and Sign Executable
+      - name: Package & Sign Clean Single Executable
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path output
           
-          # پیدا کردن فایل پکیج پرتابل نهایی
           $packer = Get-ChildItem -Path . -Filter "*portable_packer.exe" -Recurse | Select-Object -First 1
           if ($packer) {
             Copy-Item $packer.FullName -Destination "output\OyazDesk.exe" -Force
           } else {
-            $fallback = Get-ChildItem -Path . -Filter "*.exe" -Recurse | Where-Object { $_.Name -match "rustdesk.exe|OyazDesk.exe" } | Select-Object -First 1
+            $fallback = Get-ChildItem -Path . -Filter "*.exe" -Recurse | Where-Object { $_.Name -match "OyazDesk.exe|rustdesk.exe" } | Select-Object -First 1
             Copy-Item $fallback.FullName -Destination "output\OyazDesk.exe" -Force
           }
 
-          Write-Host "Creating Trusted Code Signing Certificate for Vahid Hedyati..."
+          Write-Host "Generating Trusted Code Signing Certificate..."
           $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Vahid Hedyati, O=Vahid Hedyati, E=vahid@hedyati.ir" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
           $password = ConvertTo-SecureString -String "OyazDesk2026" -Force -AsPlainText
           Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
