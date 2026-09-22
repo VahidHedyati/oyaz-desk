@@ -19,31 +19,30 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Inject Oyaz Branding & Assets
+      - name: Inject Vahid Hedyati Branding & Metadata
         shell: bash
         run: |
-          echo "Injecting Oyaz Custom Configurations & Logos..."
+          echo "Injecting Developer & Project Metadata..."
           # ۱. تنظیمات سرور و کلید عمومی
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
 
-          # ۲. آیکون پنجره و فایل اجرایی ویندوز
+          # ۲. آیکون و متادیتای اختصاصی ویندوز
           cp branding/icon.ico res/icon.ico 2>/dev/null || true
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
+          if [ -f "branding/win_res.rc" ]; then
+            cp -f branding/win_res.rc res/win_res.rc
+          fi
 
-          # ۳. جایگزینی ایمن تمام لوگوهای رابط کاربری فلاتر با نشان ایاز
+          # ۳. تزریق نشان‌های بصری
           if [ -f "branding/logo.png" ]; then
-            echo "Found branding/logo.png, injecting..."
             cp -f branding/logo.png flutter/assets/logo.png
             cp -f branding/logo.png flutter/assets/logo_light.png
             cp -f branding/logo.png flutter/assets/logo_dark.png
             cp -f branding/logo.png flutter/assets/icon.png
-          else
-            echo "branding/logo.png not found, continuing safely."
           fi
 
           if [ -f "branding/logo.svg" ]; then
-            echo "Found branding/logo.svg, injecting..."
             cp -f branding/logo.svg flutter/assets/logo.svg
             cp -f branding/logo.svg flutter/assets/icon.svg
           fi
@@ -85,22 +84,36 @@ jobs:
         run: |
           python3 build.py --flutter
 
-      - name: Prepare Clean Single Exe Artifact
-        shell: bash
+      - name: Prepare and Sign Executable
+        shell: pwsh
         run: |
-          mkdir -p output
-          PACKER=$(find . -type f -name "*portable_packer.exe" | head -n 1)
-          if [ -n "$PACKER" ]; then
-            echo "Packaging portable client from $PACKER"
-            cp "$PACKER" output/OyazDesk.exe
-          else
-            echo "Falling back to standalone executable"
-            find . -type f -name "rustdesk.exe" -exec cp {} output/OyazDesk.exe \;
-          fi
-          ls -lh output/
+          New-Item -ItemType Directory -Force -Path output
+          $packer = Get-ChildItem -Path . -Filter "*portable_packer.exe" -Recurse | Select-Object -First 1
+          if ($packer) {
+            Copy-Item $packer.FullName -Destination "output\OyazDesk.exe" -Force
+          } else {
+            $fallback = Get-ChildItem -Path . -Filter "rustdesk.exe" -Recurse | Select-Object -First 1
+            Copy-Item $fallback.FullName -Destination "output\OyazDesk.exe" -Force
+          }
 
-      - name: Upload OyazDesk Executable
+          Write-Host "Creating Code Signing Certificate for Vahid Hedyati..."
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Vahid Hedyati, O=Vahid Hedyati, E=vahid@hedyati.ir" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
+          $password = ConvertTo-SecureString -String "OyazDesk2026" -Force -AsPlainText
+          Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
+          Export-Certificate -Cert $cert -FilePath "output\VahidHedyati-RootCA.cer" | Out-Null
+
+          $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Select-Object -First 1).FullName
+          if ($signtool) {
+            Write-Host "Signing OyazDesk.exe with Publisher: Vahid Hedyati..."
+            & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk.exe"
+          }
+          Remove-Item "output\temp_sign.pfx" -Force
+          Get-ChildItem output\
+
+      - name: Upload Signed OyazDesk
         uses: actions/upload-artifact@v4
         with:
           name: OyazDesk-v1.0-Windows-x64
-          path: output/OyazDesk.exe
+          path: |
+            output/OyazDesk.exe
+            output/VahidHedyati-RootCA.cer
