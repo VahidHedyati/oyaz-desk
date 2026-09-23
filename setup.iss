@@ -35,7 +35,6 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [InstallDelete]
-; حذف ایمن فایل‌های قفل‌شده قبلی قبل از کپی نسخه جدید
 Type: files; Name: "{app}\{#MyAppExeName}"
 Type: files; Name: "{app}\librustdesk.dll"
 
@@ -47,22 +46,22 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; ۱. توقف سرویس‌های قدیمی پیش از شروع کار
+; ۱. متوقف کردن پروسس‌های قدیمی
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
 Filename: "sc.exe"; Parameters: "stop {#MyAppName}"; Flags: runhidden
 
-; ۲. نصب قطعی سرتیفیکیت دائمی وحید هدیتی
+; ۲. نصب گواهی ریشه اختصاصی وحید هدیتی
 Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{app}\VahidHedyati-RootCA.cer"""; Flags: runhidden
 
-; ۳. باز کردن فایروال جهت ارتباط مستقیم شبکه داخلی کارخانه
+; ۳. باز کردن پورت‌های اختصاصی LAN و P2P در فایروال جهت ارتباط با حداکثر سرعت شبکه محلی
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk App"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
+Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت و اجرای سرویس سیستمی دائم
+; ۴. ثبت سرویس در ویندوز (تنها ثبت سرویس، بدون اجرای نابهنگام UI)
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden
 
-; ۵. اجرای برنامه پس از اتمام نصب
+; ۵. اجرای برنامه تنها پس از کلیک کاربر روی دکمه Finish
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -71,3 +70,4 @@ Filename: "{app}\{#MyAppExeName}"; Parameters: "--uninstall-service"; Flags: run
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk App"""; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk Direct Port"""; Flags: runhidden
+Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk LAN P2P"""; Flags: runhidden
