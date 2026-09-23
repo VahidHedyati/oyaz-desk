@@ -58,9 +58,9 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت سرویس و بستن پردازش گرافیکی زودهنگام در سشن کاربر بدون آسیب به سرویس پس‌زمینه
+; ۴. ثبت سرویس در پس‌زمینه و بستن بی‌درنگ پردازش گرافیکی ایجادشده حین نصب
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden waituntilterminated
-Filename: "powershell.exe"; Parameters: "-NoProfile -Command ""Start-Sleep -Milliseconds 600; Get-Process {#MyAppName} -ErrorAction SilentlyContinue | Where-Object { $_.SessionId -ne 0 } | Stop-Process -Force"""; Flags: runhidden
+Filename: "cmd.exe"; Parameters: "/c ping 127.0.0.1 -n 2 >nul & taskkill /F /FI ""SESSION ne 0"" /IM {#MyAppExeName}"; Flags: runhidden
 
 ; ۵. اجرای تمیز و تک‌باره برنامه منحصراً پس از کلیک کاربر روی دکمه Finish
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
