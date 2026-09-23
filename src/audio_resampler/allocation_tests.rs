@@ -1,4 +1,4 @@
-﻿use super::{AudioResamplerConfig, FixedFrameAudioResampler};
+use super::{AudioResamplerConfig, FixedFrameAudioResampler};
 use std::alloc::{GlobalAlloc, Layout, System};
 use std::cell::Cell;
 
@@ -140,4 +140,3 @@ fn sinc_output_matches_the_existing_backend() {
         }
     }
 }
-

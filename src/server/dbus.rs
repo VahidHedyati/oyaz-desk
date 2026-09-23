@@ -1,4 +1,4 @@
-﻿/// Url handler based on dbus
+/// Url handler based on dbus
 ///
 /// Note:
 /// On linux, we use dbus to communicate between multiple rustdesk processes.
@@ -90,4 +90,3 @@ fn handle_client_message(builder: &mut IfaceBuilder<()>) {
         },
     );
 }
-

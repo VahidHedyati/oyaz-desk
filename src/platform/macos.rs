@@ -1,4 +1,4 @@
-﻿// https://developer.apple.com/documentation/appkit/nscursor
+// https://developer.apple.com/documentation/appkit/nscursor
 // https://github.com/servo/core-foundation-rs
 // https://github.com/rust-windowing/winit
 
@@ -836,7 +836,7 @@ pub fn lock_screen() {
 /// silent auto-update thread.
 pub fn start_os_service() {
     log::info!("Username: {}", crate::username());
-    // Silent auto-update â€” runs as root via LaunchDaemon, no osascript dialog needed
+    // Silent auto-update — runs as root via LaunchDaemon, no osascript dialog needed
     crate::updater::start_auto_update_macos();
     if let Err(err) = crate::ipc::start("_service") {
         log::error!("Failed to start ipc_service: {}", err);
@@ -1190,7 +1190,7 @@ pub fn update_from_dmg_as_root(dmg_path: &str, expected_version: &str) -> Result
         }
     }
 
-    // Backup current plists before overwriting â€” needed for restore on reload failure
+    // Backup current plists before overwriting — needed for restore on reload failure
     let daemon_plist_bak = format!("{}/daemon_plist.bak", tmp_dir);
     let agent_plist_bak = format!("{}/agent_plist.bak", tmp_dir);
     // Backups are part of the update transaction. Do not allow the new
@@ -1210,7 +1210,7 @@ pub fn update_from_dmg_as_root(dmg_path: &str, expected_version: &str) -> Result
     // moved into its final root-owned location.  This avoids executing code
     // directly from /tmp while ensuring the plist matches the new release.
 
-    // Final session check after extraction â€” minimize race window
+    // Final session check after extraction — minimize race window
     if !crate::updater::has_no_active_conns_ipc() {
         let _ = std::fs::remove_dir_all(&tmp_dir);
         bail!("[root-update] Active session detected after extraction, deferring update.");
@@ -1654,7 +1654,7 @@ if ! chown -R root:wheel {app_bundle} || ! chmod -R go-w {app_bundle}; then
     exit 1
 fi
 xattr -r -d com.apple.quarantine {app_bundle} || true
-# Keep root-executed files AND entire ancestor chain root-owned â€” prevent privilege escalation
+# Keep root-executed files AND entire ancestor chain root-owned — prevent privilege escalation
 if ! chown root:wheel {app_bundle} || \
    ! chmod 755 {app_bundle} || \
    ! chown root:wheel {app_bundle}/Contents || \
@@ -1688,7 +1688,7 @@ if ! daemon_ready; then
     echo "[root-update] CRITICAL: daemon failed readiness check, restoring" >> {tmp_dir}/rustdesk_root_update.log
     exit 1
 fi
-# Bootstrap agent BEFORE removing backup â€” needed for rollback on failure.
+# Bootstrap agent BEFORE removing backup — needed for rollback on failure.
 # This also uses launchctl load for the login-window/no-console-user case.
 if ! bootstrap_agents || ! agent_ready; then
     echo "[root-update] CRITICAL: agent bootstrap failed, rolling back" >> {tmp_dir}/rustdesk_root_update.log
@@ -2116,4 +2116,3 @@ fn get_bundle_id() -> Option<String> {
         Some(bundle_id_str)
     }
 }
-

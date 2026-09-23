@@ -1,4 +1,4 @@
-﻿use super::super::{new_pcm_handoff, CAPTURE_PCM_QUEUE_PACKETS};
+use super::super::{new_pcm_handoff, CAPTURE_PCM_QUEUE_PACKETS};
 use super::*;
 use crate::audio_resampler::allocation_tests::assert_no_allocations;
 use magnum_opus::{Application::LowDelay, Decoder, Encoder};
@@ -184,4 +184,3 @@ fn capture_loss_is_reported_while_packets_remain_queued() {
     assert!(receiver.take_loss().is_empty());
     receiver.recycle(packet);
 }
-

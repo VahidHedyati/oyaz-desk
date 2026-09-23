@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 use hbb_common::{
     anyhow::{anyhow, Context, Result},
     compress,
@@ -31,7 +31,7 @@ const MAX_OUTPUT_BUFFER_SIZE: usize = 1024 * 1024; // 1MB per terminal
 const MAX_BUFFER_LINES: usize = 10000;
 const MAX_SERVICES: usize = 100; // Maximum number of persistent terminal services
 const SERVICE_IDLE_TIMEOUT: Duration = Duration::from_secs(3600); // 1 hour idle timeout
-const CHANNEL_BUFFER_SIZE: usize = 500; // Channel buffer size. Max per-message size ~4KB (reader buffer), so worst case ~500*4KB â‰ˆ 2MB/terminal. Increased from 100 to reduce data loss during disconnects.
+const CHANNEL_BUFFER_SIZE: usize = 500; // Channel buffer size. Max per-message size ~4KB (reader buffer), so worst case ~500*4KB ≈ 2MB/terminal. Increased from 100 to reduce data loss during disconnects.
 const COMPRESS_THRESHOLD: usize = 512; // Compress terminal data larger than this
                                        // Default max bytes for reconnection buffer replay.
 const DEFAULT_RECONNECT_BUFFER_BYTES: usize = 8 * 1024;
@@ -50,7 +50,7 @@ const MAX_SIGWINCH_PHASE_ATTEMPTS: u8 = 3; // Max attempts per SIGWINCH phase be
 enum SigwinchPhase {
     /// No SIGWINCH needed.
     Idle,
-    /// Phase 1: Resize PTY to temp dimensions (rowsÂ±1). The app handles SIGWINCH
+    /// Phase 1: Resize PTY to temp dimensions (rows±1). The app handles SIGWINCH
     /// and redraws at the temporary size.
     TempResize { retries: u8 },
     /// Phase 2: Restore PTY to correct dimensions. The app handles SIGWINCH,
@@ -60,7 +60,7 @@ enum SigwinchPhase {
 
 /// Which resize to perform in the two-phase SIGWINCH sequence.
 enum SigwinchAction {
-    /// Phase 1: resize to temp dimensions (rowsÂ±1) to trigger SIGWINCH with a visible size change.
+    /// Phase 1: resize to temp dimensions (rows±1) to trigger SIGWINCH with a visible size change.
     TempResize,
     /// Phase 2: restore to correct dimensions to trigger SIGWINCH and force full redraw.
     Restore,
@@ -1052,7 +1052,7 @@ impl TerminalServiceProxy {
         //
         // The client's requested terminal_id may not match any surviving session ID
         // (e.g. _nextTerminalId incremented beyond the surviving IDs). This remap is a
-        // one-time handle reassignment â€” only the first reconnect triggers it because
+        // one-time handle reassignment — only the first reconnect triggers it because
         // needs_session_sync is cleared afterward. Remaining sessions are communicated
         // back via `persistent_sessions` with their original server-side IDs.
         if !service.sessions.contains_key(&open.terminal_id)
@@ -1606,7 +1606,7 @@ impl TerminalServiceProxy {
             session.cols = resize.cols as u16;
 
             // Note: we do NOT clear the sigwinch phase here. The server-side two-phase
-            // SIGWINCH mechanism in read_outputs() is self-contained (temp resize â†’ restore
+            // SIGWINCH mechanism in read_outputs() is self-contained (temp resize → restore
             // across two polling cycles), so client resize is purely a dimension sync and
             // doesn't affect it.
 
@@ -1745,7 +1745,7 @@ impl TerminalServiceProxy {
 
         let target_rows = match action {
             SigwinchAction::TempResize => {
-                // For very small terminals (â‰¤2 rows), subtracting 1 would result in an unusable
+                // For very small terminals (≤2 rows), subtracting 1 would result in an unusable
                 // size (0 or 1 row), so we add 1 instead. Either direction triggers SIGWINCH.
                 if rows > 2 {
                     rows.saturating_sub(1)
@@ -1991,7 +1991,7 @@ impl TerminalServiceProxy {
                         match action {
                             SigwinchAction::TempResize => {
                                 if resize_ok {
-                                    // Phase 1 succeeded â€” advance to phase 2 (restore).
+                                    // Phase 1 succeeded — advance to phase 2 (restore).
                                     *sigwinch = SigwinchPhase::Restore {
                                         retries: MAX_SIGWINCH_PHASE_ATTEMPTS,
                                     };
@@ -2000,7 +2000,7 @@ impl TerminalServiceProxy {
                             }
                             SigwinchAction::Restore => {
                                 if resize_ok {
-                                    // Phase 2 succeeded â€” SIGWINCH sequence complete.
+                                    // Phase 2 succeeded — SIGWINCH sequence complete.
                                     *sigwinch = SigwinchPhase::Idle;
                                 }
                                 // If failed, retries already decremented; will retry phase 2.
@@ -2084,8 +2084,8 @@ mod tests {
     #[test]
     fn utf8_split_point_returns_full_len_for_complete_input() {
         assert_eq!(find_utf8_split_point(b"hello"), 5);
-        assert_eq!(find_utf8_split_point("ä¸­æ–‡".as_bytes()), "ä¸­æ–‡".len());
-        assert_eq!(find_utf8_split_point("ðŸ˜€".as_bytes()), "ðŸ˜€".len());
+        assert_eq!(find_utf8_split_point("中文".as_bytes()), "中文".len());
+        assert_eq!(find_utf8_split_point("😀".as_bytes()), "😀".len());
     }
 
     #[test]
@@ -2108,7 +2108,7 @@ mod tests {
 
     #[test]
     fn utf8_chunk_accumulator_reassembles_split_multibyte_output() {
-        let full = "ä½ å¥½ä¸–ç•Œ".as_bytes();
+        let full = "你好世界".as_bytes();
         let mut chunker = Utf8ChunkAccumulator::default();
         let mut output = Vec::new();
 
@@ -2133,7 +2133,7 @@ mod tests {
         assert!(chunker.push_chunk(vec![0xB8]).is_none());
         assert_eq!(
             chunker.push_chunk(vec![0xAD]),
-            Some("ä¸­".as_bytes().to_vec())
+            Some("中".as_bytes().to_vec())
         );
         assert!(chunker.finish().is_none());
     }
@@ -2189,4 +2189,3 @@ mod tests {
         assert_eq!(buffer.total_size, actual_size);
     }
 }
-

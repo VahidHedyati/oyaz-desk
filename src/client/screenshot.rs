@@ -1,4 +1,4 @@
-﻿#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 use crate::clipboard::{update_clipboard, ClipboardSide};
 use base::message_proto::*;
 use hbb_common::ResultType;
@@ -135,4 +135,3 @@ mod tests {
         std::fs::remove_file(valid_path).unwrap();
     }
 }
-

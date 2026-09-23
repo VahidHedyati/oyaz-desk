@@ -1,4 +1,4 @@
-﻿#[cfg(target_os = "linux")]
+#[cfg(target_os = "linux")]
 pub use linux::*;
 #[cfg(target_os = "macos")]
 pub use macos::*;
@@ -245,4 +245,3 @@ mod tests {
         println!("resolutions:{:?}", resolutions(name));
     }
 }
-

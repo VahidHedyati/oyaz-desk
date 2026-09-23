@@ -1,4 +1,4 @@
-﻿use std::{
+use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
     time::Duration,
@@ -441,4 +441,3 @@ mod tests {
         assert_eq!(switch_grant_signed_msg("id1", "c1", "1700000000"), expected);
     }
 }
-

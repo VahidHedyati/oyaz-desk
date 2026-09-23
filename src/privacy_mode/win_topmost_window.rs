@@ -1,4 +1,4 @@
-﻿use super::{PrivacyMode, INVALID_PRIVACY_MODE_CONN_ID};
+use super::{PrivacyMode, INVALID_PRIVACY_MODE_CONN_ID};
 use crate::{platform::windows::get_user_token, privacy_mode::PrivacyModeState};
 use hbb_common::{allow_err, bail, log, ResultType};
 use std::{
@@ -632,4 +632,3 @@ fn rect_covers(window_rect: &RECT, monitor_rect: &RECT) -> bool {
         && window_rect.right >= monitor_rect.right
         && window_rect.bottom >= monitor_rect.bottom
 }
-

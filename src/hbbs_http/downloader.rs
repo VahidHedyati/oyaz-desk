@@ -1,4 +1,4 @@
-﻿use super::create_http_client_async_with_url_strict;
+use super::create_http_client_async_with_url_strict;
 use hbb_common::{
     bail,
     lazy_static::lazy_static,
@@ -307,4 +307,3 @@ pub fn cancel(id: &str) {
 pub fn remove(id: &str) {
     let _ = DOWNLOADERS.lock().unwrap().remove(id);
 }
-

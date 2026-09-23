@@ -1,4 +1,4 @@
-﻿use super::connection::{Connection, Sender};
+use super::connection::{Connection, Sender};
 use crate::port_forward_mux::{
     charge, close_msg, effective_window, opened_msg, run_channel, FrameSink, Inbound, RecvWindow,
     SendCredit, CHANNEL_WINDOW, INITIAL_WINDOW, MAX_CHANNELS,
@@ -529,7 +529,7 @@ mod tests {
     }
 
     /// A target that accepts and hangs up at once, so every channel ends on
-    /// the target's EOF â€” the case where only the next `open` frees the entry.
+    /// the target's EOF — the case where only the next `open` frees the entry.
     async fn drop_target() -> u16 {
         let l = TcpListener::bind("127.0.0.1:0").await.unwrap();
         let port = l.local_addr().unwrap().port();
@@ -563,4 +563,3 @@ mod tests {
         });
     }
 }
-

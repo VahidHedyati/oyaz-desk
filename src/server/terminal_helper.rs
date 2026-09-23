@@ -1,4 +1,4 @@
-﻿//! Terminal Helper Process
+//! Terminal Helper Process
 //!
 //! This module implements a helper process that runs as the logged-in user and creates
 //! the ConPTY + Shell. This is necessary because ConPTY has compatibility issues with
@@ -1090,4 +1090,3 @@ fn open_pipe(pipe_name: &str, for_read: bool) -> Result<File> {
         )),
     }
 }
-

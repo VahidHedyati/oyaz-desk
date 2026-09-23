@@ -19,15 +19,32 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Native OyazDesk Branding & Configuration
+      - name: Sanitize BOM & Native OyazDesk Configuration
         shell: bash
         run: |
-          echo "Configuring OyazDesk native parameters..."
+          echo "Sanitizing UTF-8 BOM and configuring OyazDesk parameters..."
           
-          # ۱. تنظیمات هسته سرور و نام اپلیکیشن در ساب‌ماژول
-          sed -i 's/pub const APP_NAME: &str = "rustdesk";/pub const APP_NAME: &str = "OyazDesk";/g' branding/config.rs 2>/dev/null || true
+          # حذف قطعی و تضمینی هرگونه کاراکتر مخفی BOM از کدهای منبع
+          python3 -c "
+          import os
+          for root, _, files in os.walk('.'):
+              for f in files:
+                  if f.endswith(('.rs', '.dart', '.toml', '.rc')):
+                      p = os.path.join(root, f)
+                      try:
+                          with open(p, 'rb') as fp:
+                              data = fp.read()
+                          if data.startswith(b'\xef\xbb\xbf'):
+                              with open(p, 'wb') as fp:
+                                  fp.write(data[3:])
+                      except Exception:
+                          pass
+          "
+
+          # ۱. تنظیمات هسته سرور و تغییر سراسری APP_NAME به OyazDesk
+          sed -i 's/"rustdesk"/"OyazDesk"/g' branding/config.rs 2>/dev/null || true
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
-          sed -i 's/pub const APP_NAME: &str = "rustdesk";/pub const APP_NAME: &str = "OyazDesk";/g' libs/hbb_common/src/config.rs 2>/dev/null || true
+          sed -i 's/"rustdesk"/"OyazDesk"/g' libs/hbb_common/src/config.rs 2>/dev/null || true
 
           # ۲. تنظیم آیکون‌ها و لوگوی جدید
           cp branding/icon.ico res/icon.ico 2>/dev/null || true

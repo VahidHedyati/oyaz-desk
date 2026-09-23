@@ -1,4 +1,4 @@
-﻿use crate::{common::do_check_software_update, hbbs_http::create_http_client_with_url_strict};
+use crate::{common::do_check_software_update, hbbs_http::create_http_client_with_url_strict};
 use hbb_common::{bail, config, log, ResultType};
 use base::config::keys;
 use std::{
@@ -71,7 +71,7 @@ static CONTROLLING_SESSION_COUNT: AtomicUsize = AtomicUsize::new(0);
 /// Initial wait after startup before the first update check (30 seconds).
 pub const INITIAL_CHECK_DELAY: Duration = Duration::from_secs(30);
 
-/// One full day â€” default interval between update checks.
+/// One full day — default interval between update checks.
 pub const DUR_ONE_DAY: Duration = Duration::from_secs(60 * 60 * 24);
 
 /// Minimum interval between consecutive update checks (10 minutes).
@@ -428,26 +428,26 @@ pub fn has_no_active_conns_ipc() -> bool {
         // Shell-only SSH/TTY users are excluded, while an empty GUI set maps
         // to UID 0 so the LoginWindow server is queried rather than assumed idle.
         let uids = crate::platform::get_logged_in_uids();
-        // Check each user's server â€” fail closed if any has active connections
+        // Check each user's server — fail closed if any has active connections
         for uid in uids {
             if let Ok(mut conn) = crate::ipc::connect_for_uid(1000, uid, "").await {
                 if conn.send(&crate::ipc::Data::HasNoActiveConns(None)).await.is_ok() {
                     match conn.next_timeout(1000).await {
                         Ok(Some(crate::ipc::Data::HasNoActiveConns(Some(true)))) => {
-                            // Explicit no active connections â€” safe to continue
+                            // Explicit no active connections — safe to continue
                         }
                         Ok(Some(crate::ipc::Data::HasNoActiveConns(Some(false)))) => {
                             return false; // Explicit active connections
                         }
                         _ => {
-                            return false; // Timeout/error/unexpected â€” fail closed
+                            return false; // Timeout/error/unexpected — fail closed
                         }
                     }
                 } else {
-                    return false; // Send failed â€” fail closed
+                    return false; // Send failed — fail closed
                 }
             } else {
-                return false; // Connection failed â€” fail closed
+                return false; // Connection failed — fail closed
             }
         }
         true // All users explicitly confirmed no active connections
@@ -639,7 +639,7 @@ pub fn check_update_as_root() -> ResultType<bool> {
             .map_err(|e| { let _ = std::fs::remove_dir_all(&private_tmp); e })?;
     }
     log::info!("[root-update] Downloaded to {}", tmp_path);
-    // Recheck active sessions before installing â€” download can take minutes
+    // Recheck active sessions before installing — download can take minutes
     if !has_no_active_conns_ipc() {
         if let Err(e) = std::fs::remove_dir_all(&private_tmp) {
             log::warn!("[root-update] Failed to remove temp dir {}: {}", private_tmp, e);
@@ -691,4 +691,3 @@ mod tests {
         }
     }
 }
-

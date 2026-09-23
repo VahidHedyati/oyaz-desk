@@ -1,4 +1,4 @@
-﻿use hbb_common::{
+use hbb_common::{
     async_recursion::async_recursion,
     bail,
     config::{Config, Socks5Server},
@@ -389,4 +389,3 @@ async fn create_http_client_async_with_url_(
     }
     client
 }
-

@@ -1,4 +1,4 @@
-﻿use hbb_common::thiserror;
+use hbb_common::thiserror;
 
 #[cfg(test)]
 pub(crate) mod allocation_tests;
@@ -240,4 +240,3 @@ mod tests;
 
 #[cfg(all(test, feature = "use_samplerate", not(feature = "use_dasp")))]
 mod samplerate_tests;
-

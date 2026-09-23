@@ -1,4 +1,4 @@
-﻿use std::{ffi::c_void, rc::Rc};
+use std::{ffi::c_void, rc::Rc};
 
 #[cfg(target_os = "macos")]
 use cocoa::{
@@ -275,4 +275,3 @@ pub fn show_dock() {
         NSApp().setActivationPolicy_(NSApplicationActivationPolicyRegular);
     }
 }
-

@@ -1,4 +1,4 @@
-﻿use hbb_common::ResultType;
+use hbb_common::ResultType;
 use serde::de::DeserializeOwned;
 use serde_json::{Map, Value};
 
@@ -38,4 +38,3 @@ impl<T: DeserializeOwned> HbbHttpResponse<T> {
         }
     }
 }
-

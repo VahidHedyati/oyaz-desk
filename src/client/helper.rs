@@ -1,4 +1,4 @@
-﻿use base::message_proto::{Message, VoiceCallRequest, VoiceCallResponse};
+use base::message_proto::{Message, VoiceCallRequest, VoiceCallResponse};
 use hbb_common::get_time;
 use scrap::CodecFormat;
 use std::collections::HashMap;
@@ -33,4 +33,3 @@ pub fn new_voice_call_response(request_timestamp: i64, accepted: bool) -> Messag
     msg.set_voice_call_response(resp);
     msg
 }
-

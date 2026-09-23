@@ -1,4 +1,4 @@
-﻿// The DRM/KMS capture half of the `_drm` IPC channel: types, root-service producer, framing.
+// The DRM/KMS capture half of the `_drm` IPC channel: types, root-service producer, framing.
 
 use super::ipc_auth::active_uid_cached;
 use super::*;
@@ -25,7 +25,7 @@ pub struct DrmDisplayInfo {
     pub device: String,
 }
 
-/// Mirrors `scrap::drm_reader::drmtap_dmabuf_desc` except `dma_buf_fd` (never serializes â€” it rides
+/// Mirrors `scrap::drm_reader::drmtap_dmabuf_desc` except `dma_buf_fd` (never serializes — it rides
 /// SCM_RIGHTS ancillary), and adds `buffer_id` (fb_id tagged with a per-connection epoch; no consumer reads it today) and `has_fd`.
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DmabufDesc {
@@ -34,7 +34,7 @@ pub struct DmabufDesc {
     pub height: u32,
     pub format: u32,
     pub modifier: u64,
-    /// KMS framebuffer id â€” libdrmtap's import-once cache key. 0 disables caching for this frame.
+    /// KMS framebuffer id — libdrmtap's import-once cache key. 0 disables caching for this frame.
     pub fb_id: u32,
     /// Used entries in `offsets`/`pitches` (1..4); 0 is treated as 1.
     pub num_planes: u32,
@@ -1798,4 +1798,3 @@ mod drm_conn_tests {
         );
     }
 }
-

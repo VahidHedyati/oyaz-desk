@@ -1,4 +1,4 @@
-﻿use super::super::AudioEncoder;
+use super::super::AudioEncoder;
 use super::{
     send_f32, CaptureEncoderConfig, CaptureEncoderContext, CapturePcmReceiver, CapturePcmStats,
     CAPTURE_PCM_QUEUE_PACKETS,
@@ -126,4 +126,3 @@ pub(super) fn run_capture_encoder(context: CaptureEncoderContext, config: Captur
 #[cfg(test)]
 #[path = "audio_capture_encoder_tests.rs"]
 mod tests;
-

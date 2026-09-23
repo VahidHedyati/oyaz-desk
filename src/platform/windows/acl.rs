@@ -1,4 +1,4 @@
-﻿// https://learn.microsoft.com/en-us/windows/win32/secgloss/security-glossary
+// https://learn.microsoft.com/en-us/windows/win32/secgloss/security-glossary
 
 use super::{read_token_user_buffer, wide_string, ResultType};
 use hbb_common::{anyhow::anyhow, bail};
@@ -901,4 +901,3 @@ mod tests {
         let _ = fs::remove_dir_all(&root);
     }
 }
-

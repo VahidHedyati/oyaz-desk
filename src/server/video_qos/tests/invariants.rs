@@ -1,4 +1,4 @@
-﻿//! The controller's invariants as properties over random sessions.  A scenario
+//! The controller's invariants as properties over random sessions.  A scenario
 //! test pins one trajectory; these hold whatever the trajectory:
 //!
 //! 1. viewer isolation: a viewer's private target is a function of its own
@@ -496,4 +496,3 @@ fn targets_stay_within_caps_and_the_stream_is_their_aggregation() {
         }
     }
 }
-

@@ -1,4 +1,4 @@
-﻿use hbb_common::{
+use hbb_common::{
     anyhow::anyhow,
     bail,
     config::Config,
@@ -202,4 +202,3 @@ pub fn get_chatid_telegram(bot_token: &str) -> ResultType<Option<String>> {
 
     Ok(chat_id)
 }
-

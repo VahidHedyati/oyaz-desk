@@ -1,4 +1,4 @@
-﻿use super::{create_audio_resampler, AudioDecoder, AudioFormat, AudioFrame, AudioHandler, Stereo};
+use super::{create_audio_resampler, AudioDecoder, AudioFormat, AudioFrame, AudioHandler, Stereo};
 use cpal::traits::StreamTrait;
 use hbb_common::{anyhow::anyhow, ResultType};
 use magnum_opus::{Application::LowDelay, Encoder};
@@ -126,4 +126,3 @@ fn identical_format_failure_preserves_playback_and_resampler_history() {
 fn drain_audio(handler: &AudioHandler) -> Vec<f32> {
     handler.audio_buffer.0.lock().unwrap().pop_iter().collect()
 }
-

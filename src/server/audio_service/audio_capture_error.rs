@@ -1,4 +1,4 @@
-﻿use std::sync::{
+use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
 };
@@ -127,4 +127,3 @@ mod tests {
         assert!(!replacement.needs_restart());
     }
 }
-

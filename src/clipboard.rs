@@ -1,4 +1,4 @@
-﻿#[cfg(not(target_os = "android"))]
+#[cfg(not(target_os = "android"))]
 use arboard::{ClipboardData, ClipboardFormat};
 #[cfg(target_os = "linux")]
 use arboard::{LinuxClipboardKind, SetExtLinux};
@@ -1037,4 +1037,3 @@ pub mod clipboard_listener {
         h
     }
 }
-

@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 
 pub(super) fn session(fps: u32, quality: Quality) -> VideoQoS {
     let mut qos = VideoQoS {
@@ -367,4 +367,3 @@ fn smoke_abr_bandwidth_drop_and_recovery() {
         }
     }
 }
-

@@ -1,4 +1,4 @@
-﻿use hbb_common::{log, thiserror};
+use hbb_common::{log, thiserror};
 use std::{
     ffi::OsStr,
     io,
@@ -457,4 +457,3 @@ unsafe fn open_device_handle(interface_guid: &GUID) -> Result<HANDLE, DeviceErro
     }
     Ok(h_device)
 }
-

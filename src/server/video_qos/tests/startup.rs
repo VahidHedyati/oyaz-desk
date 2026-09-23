@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 
 fn session(cap: u32, abr: bool) -> VideoQoS {
     let mut qos = super::smoke::session(cap, Quality::Balanced);
@@ -232,4 +232,3 @@ fn constrained_startup_does_not_leave_a_large_queue() {
         }
     }
 }
-

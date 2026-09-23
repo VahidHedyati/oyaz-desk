@@ -1,4 +1,4 @@
-﻿use super::{AudioResampler, AudioResamplerConfig, AudioResamplerError, FixedFrameAudioResampler};
+use super::{AudioResampler, AudioResamplerConfig, AudioResamplerError, FixedFrameAudioResampler};
 
 const INPUT_RATE: u32 = 44_100;
 const OUTPUT_RATE: u32 = 48_000;
@@ -155,4 +155,3 @@ fn samplerate_backend_reports_incomplete_frame_context() {
         }
     );
 }
-

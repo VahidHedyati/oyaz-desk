@@ -1,4 +1,4 @@
-﻿//! Closed-loop network simulation for the QoS controller.
+//! Closed-loop network simulation for the QoS controller.
 //!
 //! The controller is driven the way `Connection` drives it: one TestDelay probe per
 //! second, a single probe outstanding, `user_delay_response_elapsed` on every timer
@@ -986,4 +986,3 @@ fn replay_recorded_trace_is_independent_of_connection_id() {
     assert_eq!(expected.last(), Some(&30));
     assert_eq!(replay(1652), expected);
 }
-

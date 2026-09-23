@@ -1,4 +1,4 @@
-﻿use super::{PrivacyMode, PrivacyModeState};
+use super::{PrivacyMode, PrivacyModeState};
 use hbb_common::{anyhow::anyhow, ResultType};
 
 extern "C" {
@@ -79,4 +79,3 @@ impl Drop for PrivacyModeImpl {
         self.clear();
     }
 }
-

@@ -1,4 +1,4 @@
-﻿use super::{AudioResamplerConfig, AudioResamplerError};
+use super::{AudioResamplerConfig, AudioResamplerError};
 use libsamplerate_sys as sys;
 use std::ptr::NonNull;
 
@@ -110,4 +110,3 @@ fn backend_error(config: AudioResamplerConfig, code: i32) -> AudioResamplerError
         samplerate::Error::from_int(code)
     ))
 }
-

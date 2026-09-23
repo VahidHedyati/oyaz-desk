@@ -1,4 +1,4 @@
-﻿use crate::ipc::{self, new_listener, Connection, Data, DataKeyboard, DataMouse};
+use crate::ipc::{self, new_listener, Connection, Data, DataKeyboard, DataMouse};
 use enigo::{Key, KeyboardControllable, MouseButton, MouseControllable};
 use evdev::{
     uinput::{VirtualDevice, VirtualDeviceBuilder},
@@ -91,7 +91,7 @@ pub mod client {
 
         fn key_sequence(&mut self, sequence: &str) {
             // Sequence events are normally handled in the --server process before reaching here.
-            // Forward via IPC as a fallback â€” input_text_wayland can still handle ASCII chars
+            // Forward via IPC as a fallback — input_text_wayland can still handle ASCII chars
             // via keysym/uinput, though non-ASCII will be skipped (no clipboard in --service).
             log::debug!(
                 "UInputKeyboard::key_sequence called (len={})",
@@ -392,7 +392,7 @@ pub mod service {
 
     /// Input text on Wayland using layout-independent methods.
     /// ASCII chars (0x20-0x7E): Portal keysym or uinput fallback
-    /// Non-ASCII chars: skipped â€” this runs in the --service (root) process where clipboard
+    /// Non-ASCII chars: skipped — this runs in the --service (root) process where clipboard
     /// operations are unreliable (typically no user session environment).
     /// Non-ASCII input is normally handled by the --server process via input_text_via_clipboard_server.
     fn input_text_wayland(text: &str, keyboard: &mut VirtualDevice) {
@@ -406,7 +406,7 @@ pub mod service {
         for c in text.chars() {
             let keysym = char_to_keysym(c);
             if can_input_via_keysym(c, keysym) {
-                // Try Portal first â€” down+up on the same channel
+                // Try Portal first — down+up on the same channel
                 if let Some((ref conn, ref session)) = portal_info {
                     let portal = scrap::wayland::pipewire::get_portal(conn);
                     if portal
@@ -480,7 +480,7 @@ pub mod service {
             let key = enigo::Key::Layout(chr);
             if let Ok((evdev_key, is_shift)) = map_key(&key) {
                 if down {
-                    // Press: Shiftâ†“ (if needed) â†’ Keyâ†“
+                    // Press: Shift↓ (if needed) → Key↓
                     if is_shift {
                         let shift_down =
                             InputEvent::new(EventType::KEY, evdev::Key::KEY_LEFTSHIFT.code(), 1);
@@ -491,7 +491,7 @@ pub mod service {
                     let key_down = InputEvent::new(EventType::KEY, evdev_key.code(), 1);
                     allow_err!(keyboard.emit(&[key_down]));
                 } else {
-                    // Release: Keyâ†‘ â†’ Shiftâ†‘ (if needed)
+                    // Release: Key↑ → Shift↑ (if needed)
                     let key_up = InputEvent::new(EventType::KEY, evdev_key.code(), 0);
                     allow_err!(keyboard.emit(&[key_up]));
                     if is_shift {
@@ -1366,4 +1366,3 @@ mod mouce {
         }
     }
 }
-

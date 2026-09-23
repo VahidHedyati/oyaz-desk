@@ -1,4 +1,4 @@
-﻿use std::{
+use std::{
     collections::HashMap,
     net::SocketAddr,
     sync::{Arc, Mutex, RwLock, Weak},
@@ -913,4 +913,3 @@ pub async fn stop_main_window_process() {
         }
     }
 }
-

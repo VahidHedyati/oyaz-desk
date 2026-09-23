@@ -1,4 +1,4 @@
-﻿use hbb_common::{
+use hbb_common::{
     anyhow,
     bytes::{Bytes, BytesMut},
     bytes_codec::BytesCodec,
@@ -138,8 +138,8 @@ impl KcpStream {
         let udp = udp_socket.clone();
         tokio::spawn(async move {
             let mut buf = vec![0; 1500];
-            // Socket errors are ICMP unreachable on a connected UDP socket â€” advisory, and
-            // routine while a hole forms â€” so treat them as loss and let KCP's pong timeout reap
+            // Socket errors are ICMP unreachable on a connected UDP socket — advisory, and
+            // routine while a hole forms — so treat them as loss and let KCP's pong timeout reap
             // a link that is really dead. One throttle PER DIRECTION: the error is reported once
             // and cleared, so send-ok/recv-err alternates and a shared counter never fires.
             loop {
@@ -312,4 +312,3 @@ mod tests {
         );
     }
 }
-

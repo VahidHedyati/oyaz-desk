@@ -1,4 +1,4 @@
-﻿use super::{gtk_sudo, CursorData, ResultType};
+use super::{gtk_sudo, CursorData, ResultType};
 use desktop::Desktop;
 pub use base::platform::linux::*;
 
@@ -381,7 +381,7 @@ pub fn is_login_screen_wayland() -> bool {
 
 /// An explicit `RUSTDESK_FORCED_DISPLAY_SERVER` is an operator override, and the root service
 /// forwards it to the per-user server on purpose: the greeter correction may only fix an
-/// AUTO-detected answer, never argue with the operator â€” a half-applied override would leave
+/// AUTO-detected answer, never argue with the operator — a half-applied override would leave
 /// `get_display_server()` and the DRM routing gates disagreeing with each other.
 #[cfg(feature = "drm")]
 pub(crate) fn display_server_forced() -> bool {
@@ -2963,4 +2963,3 @@ pub fn has_gnome_shortcuts_inhibitor_permission() -> bool {
         }
     }
 }
-

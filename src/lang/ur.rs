@@ -784,4 +784,3 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
     ].iter().cloned().collect();
 }
 
-

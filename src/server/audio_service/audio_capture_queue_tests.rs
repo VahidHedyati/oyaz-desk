@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 use crate::audio_resampler::allocation_tests::assert_no_allocations;
 use std::{sync::mpsc, time::Duration};
 
@@ -167,4 +167,3 @@ fn concurrent_handoff_preserves_order_buffers_and_loss_counts_across_sequence_wr
         assert_pool_restored(&receiver, capacity);
     }
 }
-

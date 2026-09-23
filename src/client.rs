@@ -1,4 +1,4 @@
-﻿#[cfg(not(any(target_os = "android", target_os = "ios")))]
+#[cfg(not(any(target_os = "android", target_os = "ios")))]
 use crate::clipboard::clipboard_listener;
 use async_trait::async_trait;
 use bytes::Bytes;
@@ -215,8 +215,8 @@ impl Drop for OffererGuard {
 
 /// Race WebRTC against the other transports, preferring P2P: `select_ok` would always pick the
 /// relay, whose TCP connect beats ICE + DTLS + SCTP by an order of magnitude. An `is_p2p` result
-/// wins outright; a relayed one â€” from either side, since `webrtc_fut` is a whole punch attempt
-/// that can also end in a relay â€” is held for `window_ms` to give the other side a chance.
+/// wins outright; a relayed one — from either side, since `webrtc_fut` is a whole punch attempt
+/// that can also end in a relay — is held for `window_ms` to give the other side a chance.
 ///
 /// `others` must be non-empty (`select_ok` requires it).
 async fn race_transports_prefer_webrtc<'a, T: 'a>(
@@ -248,8 +248,8 @@ async fn race_transports_prefer_webrtc<'a, T: 'a>(
                     Ok(conn) if is_p2p(&conn) || others_fut.is_none() => return Ok(conn),
                     // `webrtc_fut` is a whole punch attempt, not just the WebRTC connect, so it
                     // can end in a relay of its own. Committing that immediately would preempt a
-                    // direct punch still in flight on the other branch â€” the exact inversion this
-                    // function exists to prevent â€” so hold it on the same terms as any relay.
+                    // direct punch still in flight on the other branch — the exact inversion this
+                    // function exists to prevent — so hold it on the same terms as any relay.
                     Ok(conn) => {
                         if held.is_none() {
                             held = Some(conn);
@@ -305,7 +305,7 @@ async fn race_transports_prefer_webrtc<'a, T: 'a>(
                         }
                     }
                     Err(e) => match webrtc_err.take() {
-                        // Nothing more can win, but a parked relay is still a valid outcome â€” take
+                        // Nothing more can win, but a parked relay is still a valid outcome — take
                         // it before failing the connection.
                         Some(we) => match held.take() {
                             Some(conn) => return Ok(conn),
@@ -347,7 +347,7 @@ fn request_allows_tcp_punch(webrtc_sdp_offer: &str) -> bool {
 
 /// TCP punch is a user option like the other direct transports, but it is also the backstop:
 /// with every direct transport switched off there would be nothing left to punch with, so it
-/// runs regardless. Only the switches decide that â€” a transport that is enabled but fails to
+/// runs regardless. Only the switches decide that — a transport that is enabled but fails to
 /// materialize (no public v6 address, offerer setup error) leaves this alone, because the
 /// relay fallback already covers a round that ends up with no usable direct transport.
 fn tcp_punch_allowed() -> bool {
@@ -545,7 +545,7 @@ impl Client {
             contained,
         );
         // The fallback request exists only to carry a TCP punch, so it is pointless once TCP
-        // punch is off â€” it would reach `connect()` with nothing to try and just open a second
+        // punch is off — it would reach `connect()` with nothing to try and just open a second
         // relay.
         if interface.is_force_relay()
             || (udp.0.is_none() && !has_webrtc_offerer)
@@ -643,20 +643,20 @@ impl Client {
     /// UDP-NAT-test wait when the TCP clock is implausible (see TCP_RTT_PLAUSIBLE_MIN). The
     /// normal bound is `rtt / 2`: the test has been running since before the TCP connect, so on
     /// a network where TCP RTT ~ UDP RTT its response has already landed. A transparent TCP
-    /// proxy â€” a TUN-mode VPN on the host, or a redirect-mode proxy on the LAN gateway (soft
-    /// router), which fakes the handshake for every device behind it â€” breaks that by answering
+    /// proxy — a TUN-mode VPN on the host, or a redirect-mode proxy on the LAN gateway (soft
+    /// router), which fakes the handshake for every device behind it — breaks that by answering
     /// in ~3ms while the real UDP round trip is hundreds of ms: the window collapsed to ~1.5ms,
     /// udp_port stayed 0, and UDP punch never ran on such networks. The wait still exits the instant the port
     /// arrives, so a genuinely nearby server (LAN hbbs) pays nothing; only UDP-dead networks
-    /// wait out the full grace, and only on this round â€” the pure-TCP fallback round never
+    /// wait out the full grace, and only on this round — the pure-TCP fallback round never
     /// waits. Sized as a ceiling on real-world rendezvous RTTs plus one 20ms retransmit
     /// (intercontinental ~300ms); paths slower than that lose UDP punch under a proxy, which
     /// is today's behavior, not a regression.
     const UDP_NAT_TEST_GRACE: Duration = Duration::from_millis(400);
 
-    /// Below this, the measured TCP connect time is not a believable WAN round trip â€” it was
+    /// Below this, the measured TCP connect time is not a believable WAN round trip — it was
     /// answered inside the LAN (host TUN proxy, gateway transparent proxy, or a genuinely local
-    /// server) â€” and must not be used to size the UDP window.
+    /// server) — and must not be used to size the UDP window.
     /// Generous on purpose: over-triggering costs nothing (the wait exits on arrival, and a
     /// UDP-dead round loses to the racing fallback anyway), while a tight bound would let a
     /// busy proxy's occasional ~80ms handshake slip through and silently drop UDP punch.
@@ -672,7 +672,7 @@ impl Client {
     ///
     /// Never reconnect this socket: its address *is* the return route (the server mangles it into
     /// `PunchHole.socket_addr` and resolves the echo through `tcp_punch`), so a new address is one
-    /// nothing points at. Once it dies, both directions are dead â€” abandon WebRTC, do not retry.
+    /// nothing points at. Once it dies, both directions are dead — abandon WebRTC, do not retry.
     fn spawn_webrtc_ice_bridge(
         mut socket: Stream,
         mut local_ice_rx: Option<UnboundedReceiver<String>>,
@@ -922,7 +922,7 @@ impl Client {
         let allow_tcp_punch = tcp_punch_allowed() && request_allows_tcp_punch(&webrtc_sdp_offer);
         // Every direct transport this round carries, not one of them: a round can carry several
         // at once (a NAT port and an offer and a v6 address), and since the TCP punch became a
-        // switch it can carry none â€” a single name had to misreport both. `relay` is not a punch,
+        // switch it can carry none — a single name had to misreport both. `relay` is not a punch,
         // it is what a round with nothing to punch with can still end as.
         let mut transports = Vec::new();
         if udp_nat_port > 0 {
@@ -1149,7 +1149,7 @@ impl Client {
                                 // Resolve relayed-ness here, not from the label: WebRTC is only a
                                 // P2P path when ICE nominated a non-TURN pair, and the race has to
                                 // know which it got. Committing a TURN pair as if it were direct
-                                // cancels a genuine direct attempt still in flight â€” the same
+                                // cancels a genuine direct attempt still in flight — the same
                                 // inversion the preference window exists to prevent, one level up.
                                 let relayed = raced.is_relayed().await.unwrap_or(true);
                                 Ok((Stream::WebRTC(raced), None, "WebRTC", !relayed))
@@ -1243,7 +1243,7 @@ impl Client {
                             Err(e) => return Err(e),
                         };
                         // `direct` came from the winning future, which resolved it while the pc was
-                        // definitely alive â€” the race needed it to pick a winner at all.
+                        // definitely alive — the race needed it to pick a winner at all.
                         // Secured and WebRTC won: disarm so the returned conn keeps the pc alive.
                         if typ == "WebRTC" {
                             if let Some(guard) = webrtc_guard.take() {
@@ -1259,7 +1259,7 @@ impl Client {
                     Some(rendezvous_message::Union::IceCandidate(ice)) => {
                         if Self::is_expected_webrtc_ice_candidate(&ice, &webrtc_session_key) {
                             // Evict the oldest, not the newest. Candidates arrive in gathering
-                            // order â€” host first, then srflx, then relay â€” so dropping arrivals
+                            // order — host first, then srflx, then relay — so dropping arrivals
                             // would discard exactly the ones that traverse NAT and keep the
                             // host ones that only work on a shared LAN.
                             if pending_webrtc_ice.len() >= Self::MAX_PENDING_WEBRTC_ICE {
@@ -1414,8 +1414,8 @@ impl Client {
         Option<KcpStream>,
         &'static str,
     )> {
-        // Guard the offerer for the whole of connect(): any early return â€” cancellation during the
-        // awaits below, the relay override, or a secure_connection failure â€” closes its pc via the
+        // Guard the offerer for the whole of connect(): any early return — cancellation during the
+        // awaits below, the relay override, or a secure_connection failure — closes its pc via the
         // guard's drop. Disarmed only once WebRTC is the confirmed winning, secured transport.
         let mut webrtc_guard = webrtc_offerer.map(OffererGuard::new);
         let direct_failures = interface.get_lch().read().unwrap().direct_failures;
@@ -1493,7 +1493,7 @@ impl Client {
             .and_then(|g| g.stream())
             .map(|stream| {
                 let mut raced = stream.clone();
-                // The punch-tuned timeout can be as low as 1s â€” enough for a raw TCP SYN but not
+                // The punch-tuned timeout can be as low as 1s — enough for a raw TCP SYN but not
                 // for candidate trickle + ICE checks + DTLS. Give WebRTC its own floor (prefer-P2P)
                 // so a viable P2P path is not abandoned before it can complete; TCP/UDP keep the
                 // tighter timeout, so a working direct connection still wins immediately, and the
@@ -1628,7 +1628,7 @@ impl Client {
         if typ == "WebRTC" {
             // WebRTC through a TURN server (force_relay, or a TURN pair winning under All
             // policy) is relayed traffic; report the direct flag accordingly. An unknown answer
-            // counts as relayed â€” claiming a P2P path needs evidence of one.
+            // counts as relayed — claiming a P2P path needs evidence of one.
             if conn.webrtc_relayed().await.unwrap_or(true) {
                 direct = false;
             }
@@ -1659,7 +1659,7 @@ impl Client {
         // mismatch is concrete evidence of a rendezvous/relay MITM (not a legacy peer), and
         // callers fall back to a fresh relay connection rather than proceeding on that channel.
         // Without a trusted identity (absent, or unverifiable under our configured root) no
-        // binding is possible at all; WebRTC then proceeds like TCP's non-secure fallback â€”
+        // binding is possible at all; WebRTC then proceeds like TCP's non-secure fallback —
         // DTLS-encrypted but reported unsecured. TCP/UDP/relay keep their existing behavior.
         let is_webrtc = conn.is_webrtc();
         let mut sign_pk = None;
@@ -2359,7 +2359,7 @@ impl AudioHandler {
 
         self.simple = Some(Simple::new(
             None,                   // Use the default server
-            &crate::get_app_name(), // Our applicationâ€™s name
+            &crate::get_app_name(), // Our application’s name
             Direction::Playback,    // We want a playback stream
             None,                   // Use the default device
             "playback",             // Description of our stream
@@ -2977,7 +2977,7 @@ impl LoginConfigHandler {
         self.clear_restarting_remote_device();
         // Three scopes: what was decided about this PEER, what this CLIENT is set up as (proxy),
         // and what its TRANSPORT forces (ws). Only the first may be written back to the peer's
-        // config â€” persisting the others would make a local setup a permanent peer property.
+        // config — persisting the others would make a local setup a permanent peer property.
         self.peer_relay =
             config::option2bool("force-always-relay", &self.get_option("force-always-relay"))
                 || force_relay;
@@ -3699,7 +3699,7 @@ impl LoginConfigHandler {
                     .insert("other-server-key".to_owned(), c.clone());
             }
         }
-        // peer_relay only â€” see `initialize`: neither the proxy nor the WebSocket transport is a
+        // peer_relay only — see `initialize`: neither the proxy nor the WebSocket transport is a
         // fact about this peer, and writing one here makes it permanent.
         if self.peer_relay {
             config
@@ -5567,7 +5567,7 @@ mod webrtc_race_tests {
         assert!(!request_allows_tcp_punch("webrtc://offer"));
     }
 
-    // A direct result must win even when it lands first â€” the LAN ordering, where ICE beats the
+    // A direct result must win even when it lands first — the LAN ordering, where ICE beats the
     // relay's TCP connect. Parking it as if it were a relay commits the relay on arrival.
     #[tokio::test]
     async fn direct_result_wins_even_when_it_arrives_first() {
@@ -5695,7 +5695,7 @@ mod webrtc_race_tests {
         assert_eq!(got, "ipv6");
     }
 
-    // Both attempts error, but a relay was parked before they did â€” it is the outcome, not a
+    // Both attempts error, but a relay was parked before they did — it is the outcome, not a
     // composed error.
     #[tokio::test]
     async fn held_relay_survives_both_errors() {
@@ -5795,4 +5795,3 @@ mod webrtc_race_tests {
         assert!(err.contains("webrtc dead") && err.contains("relay dead"), "{}", err);
     }
 }
-

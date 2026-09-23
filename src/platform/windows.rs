@@ -1,4 +1,4 @@
-﻿use super::{CursorData, ResultType};
+use super::{CursorData, ResultType};
 use crate::{
     common::PORTABLE_APPNAME_RUNTIME_ENV_KEY,
     custom_server::*,
@@ -1254,7 +1254,7 @@ pub fn portable_service_logon_helper_paths() -> Option<(PathBuf, PathBuf)> {
         .join("AppData")
         .join("Local")
         .join("rustdesk-sciter");
-    let dst = dir.join("OyazDesk.exe");
+    let dst = dir.join("rustdesk.exe");
     Some((dir, dst))
 }
 
@@ -4846,7 +4846,7 @@ mod tests {
     #[test]
     fn install_app_names_enforce_ascii_command_safety() {
         assert!(validate_install_app_name("RustDesk-Admin1").is_ok());
-        for app_name in ["", "RustDesk_Admin", "RustDesk&whoami", "RustDeskåº”ç”¨"] {
+        for app_name in ["", "RustDesk_Admin", "RustDesk&whoami", "RustDesk应用"] {
             assert!(
                 validate_install_app_name(app_name).is_err(),
                 "unsafe application name was accepted: {app_name}"
@@ -4953,4 +4953,3 @@ ProcessId=10136
         assert_eq!(pids.len(), 0);
     }
 }
-

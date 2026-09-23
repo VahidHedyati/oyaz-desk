@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 use crate::client::{
     audio_playback::AudioPlaybackStatus, audio_playback_recovery::STARTUP_CONFIRMATION_TIMEOUT,
 };
@@ -224,4 +224,3 @@ fn superseding_format_preserves_failure_when_both_outputs_failed() {
     assert!(handler.audio_stream.is_none());
     assert!(handler.playback_recovery.retry_at.is_some());
 }
-

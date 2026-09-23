@@ -1,4 +1,4 @@
-﻿use super::{
+use super::{
     normalize_msi_product_code, ResultType, MSI_WINDOWS_INSTALLER_VALUE, REG_NAME_WINDOWS_INSTALLER,
 };
 use hbb_common::{anyhow::anyhow, bail, log};
@@ -94,4 +94,3 @@ pub(super) fn is_matching_entry(
         ),
     }
 }
-

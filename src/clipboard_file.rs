@@ -1,4 +1,4 @@
-﻿use clipboard::ClipboardFile;
+use clipboard::ClipboardFile;
 use base::message_proto::*;
 
 pub fn clip_2_msg(clip: ClipboardFile) -> Message {
@@ -433,4 +433,3 @@ pub mod unix_file_clip {
         vec![]
     }
 }
-

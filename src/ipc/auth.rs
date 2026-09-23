@@ -1,4 +1,4 @@
-﻿use crate::ipc::{Connection, ConnectionTmpl};
+use crate::ipc::{Connection, ConnectionTmpl};
 #[cfg(all(windows, not(feature = "flutter")))]
 use hbb_common::sha2::{Digest, Sha256};
 #[cfg(any(target_os = "linux", target_os = "macos", target_os = "windows"))]
@@ -1035,4 +1035,3 @@ mod tests {
         assert_eq!(parsed_uid, console_uid);
     }
 }
-

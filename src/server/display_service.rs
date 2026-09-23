@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 use crate::common::SimpleCallOnReturn;
 #[cfg(target_os = "linux")]
 use crate::platform::linux::is_x11;
@@ -1022,4 +1022,3 @@ mod wayland_layout_tests {
         assert!(!l.edge(&rotated, false, 0));
     }
 }
-

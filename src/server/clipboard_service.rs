@@ -1,4 +1,4 @@
-﻿use super::*;
+use super::*;
 #[cfg(not(target_os = "android"))]
 use crate::clipboard::clipboard_listener;
 #[cfg(not(target_os = "android"))]
@@ -350,7 +350,7 @@ mod tests {
 
     #[test]
     fn decode_utf8_prefix_returns_text_for_valid_utf8() {
-        let text = "hello-Ù…Ø±Ø­Ø¨Ø§";
+        let text = "hello-مرحبا";
         assert_eq!(decode_utf8_prefix(text.as_bytes()), Some(text.to_owned()));
     }
 
@@ -376,7 +376,7 @@ mod tests {
     #[test]
     fn decode_utf8_prefix_keeps_utf8_boundary_when_limited() {
         let mut bytes = vec![b'a'; WAYLAND_CLIPBOARD_SKIP_CHECK_MAX_UTF8_BYTES - 1];
-        bytes.extend_from_slice("Ø§".as_bytes());
+        bytes.extend_from_slice("ا".as_bytes());
         let result = decode_utf8_prefix(&bytes).expect("expected decoded prefix");
         assert_eq!(
             result.len(),
@@ -385,4 +385,3 @@ mod tests {
         assert!(result.chars().all(|c| c == 'a'));
     }
 }
-

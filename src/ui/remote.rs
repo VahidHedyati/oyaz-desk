@@ -1,4 +1,4 @@
-﻿use std::{
+use std::{
     collections::HashMap,
     ops::{Deref, DerefMut},
     sync::{atomic::AtomicUsize, Arc, Mutex, RwLock},
@@ -148,8 +148,8 @@ impl InvokeUiSession for SciterHandler {
         let scale = if scale <= 0.0 { 1.0 } else { scale };
         self.call("setDisplay", &make_args!(x, y, w, h, cursor_embedded, scale));
         // https://sciter.com/forums/topic/color_spaceiyuv-crash
-        // Nothing spectacular in decoder â€“ done on CPU side.
-        // So if you can do BGRA translation on your side â€“ the better.
+        // Nothing spectacular in decoder – done on CPU side.
+        // So if you can do BGRA translation on your side – the better.
         // BGRA is used as internal image format so it will not require additional transformations.
         VIDEO.lock().unwrap().as_mut().map(|v| {
             v.stop_streaming().ok();
@@ -942,4 +942,3 @@ pub fn make_fd(id: i32, entries: &Vec<FileEntry>, only_count: bool) -> Value {
     m.set_item("total_size", n as f64);
     m
 }
-

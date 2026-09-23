@@ -1,4 +1,4 @@
-﻿use super::win_topmost_window::PRIVACY_WINDOW_NAME;
+use super::win_topmost_window::PRIVACY_WINDOW_NAME;
 use hbb_common::{bail, log, ResultType};
 use std::time::Instant;
 
@@ -55,4 +55,3 @@ pub fn create_capturer(
         }
     }
 }
-

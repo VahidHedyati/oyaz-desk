@@ -1,4 +1,4 @@
-﻿use hbb_common::{allow_err, bail, lazy_static, log, ResultType};
+use hbb_common::{allow_err, bail, lazy_static, log, ResultType};
 use std::{
     io::Error,
     sync::{
@@ -274,4 +274,3 @@ mod test {
         // privacy_hook::unhook().unwrap();
     }
 }
-
