@@ -12,7 +12,6 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-; قفل کردن اینستالر روی معماری ۶۴ بیتی خالص جهت نصب در C:\Program Files
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DefaultDirName={autopf}\{#MyAppName}
@@ -35,8 +34,12 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
+[InstallDelete]
+; حذف ایمن فایل‌های قفل‌شده قبلی قبل از کپی نسخه جدید
+Type: files; Name: "{app}\{#MyAppExeName}"
+Type: files; Name: "{app}\librustdesk.dll"
+
 [Files]
-; کپی تمامی فایل‌های هسته فلاتر، DLLها و دیتا
 Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
@@ -44,18 +47,22 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; ۱. نصب بی‌صدا و قطعی سرتیفیکیت در مخزن معتمد سیستم مقصد
+; ۱. توقف سرویس‌های قدیمی پیش از شروع کار
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
+Filename: "sc.exe"; Parameters: "stop {#MyAppName}"; Flags: runhidden
+
+; ۲. نصب قطعی سرتیفیکیت دائمی وحید هدیتی
 Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{app}\VahidHedyati-RootCA.cer"""; Flags: runhidden
 
-; ۲. باز کردن فایروال برای اتصال مستقیم در شبکه کارخانه
+; ۳. باز کردن فایروال جهت ارتباط مستقیم شبکه داخلی کارخانه
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk App"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 
-; ۳. راه‌اندازی سرویس دائمی ویندوز
+; ۴. ثبت و اجرای سرویس سیستمی دائم
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden
 
-; ۴. اجرای نرم‌افزار پس از نصب
+; ۵. اجرای برنامه پس از اتمام نصب
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
