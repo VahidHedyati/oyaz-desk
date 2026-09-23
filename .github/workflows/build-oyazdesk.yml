@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "Applying OyazDesk parameters and clean enterprise UI..."
           
-          # ۱. تنظیمات سرور و تغییر سراسری APP_NAME به OyazDesk
+          # ۱. تنظیمات سرور و تغییر نام APP_NAME
           sed -i 's/"rustdesk"/"OyazDesk"/g' branding/config.rs 2>/dev/null || true
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
           sed -i 's/"rustdesk"/"OyazDesk"/g' libs/hbb_common/src/config.rs 2>/dev/null || true
@@ -108,46 +108,72 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist, output
 
-          # جمع‌آوری خروجی خام فلاتر (شامل باینری OyazDesk.exe، DLLها و دیتا)
-          $flutterRelease = Get-ChildItem -Path "flutter\build\windows" -Filter "Release" -Directory -Recurse | Select-Object -First 1
-          if ($flutterRelease) {
-            Write-Host "Staging Flutter build from: $($flutterRelease.FullName)" -ForegroundColor Green
-            Copy-Item -Path "$($flutterRelease.FullName)\*" -Destination "dist" -Recurse -Force
+          # شناسایی دقیق پوشه واقعی خروجی فلاتر با پیدا کردن flutter_windows.dll
+          $flutterDll = (Get-ChildItem -Path "flutter\build\windows" -Filter "flutter_windows.dll" -Recurse | Select-Object -First 1)
+          if ($flutterDll) {
+            $releaseDir = $flutterDll.DirectoryName
+            Write-Host "Found true Flutter release directory: $releaseDir" -ForegroundColor Green
+            Copy-Item -Path "$releaseDir\*" -Destination "dist" -Recurse -Force
           } else {
-            Write-Host "Fallback staging from raw artifacts..." -ForegroundColor Yellow
-            Copy-Item -Path "flutter\build\windows\runner\Release\*" -Destination "dist" -Recurse -Force
+            Write-Host "Searching for executable directory..." -ForegroundColor Yellow
+            $exeDir = (Get-ChildItem -Path "flutter\build\windows" -Filter "*.exe" -Recurse | Select-Object -First 1).DirectoryName
+            Copy-Item -Path "$exeDir\*" -Destination "dist" -Recurse -Force
           }
 
-          # تولید گواهی دیجیتال اختصاصی با ایمیل رسمی vahidhedyati@gmail.com
-          Write-Host "Creating Certificate with vahidhedyati@gmail.com..."
+          # اطمینان از وجود کتابخانه هسته librustdesk.dll در dist
+          if (-not (Test-Path "dist\librustdesk.dll")) {
+            $coreDll = Get-ChildItem -Path "target\release" -Filter "librustdesk.dll" -Recurse | Select-Object -First 1
+            if ($coreDll) {
+              Copy-Item $coreDll.FullName -Destination "dist\librustdesk.dll" -Force
+            }
+          }
+
+          # اطمینان از نامگذاری باینری اصلی به نام OyazDesk.exe در dist
+          if (Test-Path "dist\rustdesk.exe") {
+            Move-Item -Path "dist\rustdesk.exe" -Destination "dist\OyazDesk.exe" -Force
+          }
+
+          # تولید گواهی دیجیتال با ایمیل رسمی vahidhedyati@gmail.com
+          Write-Host "Generating official certificate for Vahid Hedyati (vahidhedyati@gmail.com)..."
           $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Vahid Hedyati, O=Vahid Hedyati, E=vahidhedyati@gmail.com" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
           $password = ConvertTo-SecureString -String "OyazDesk2026" -Force -AsPlainText
           Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
           
-          # ذخیره فایل سرتیفیکیت در داخل سورس نصاب جهت نصب خودکار در سیستم مقصد
+          # کپی فایل سرتیفیکیت در dist برای نصب خودکار توسط اینستالر
           Export-Certificate -Cert $cert -FilePath "dist\VahidHedyati-RootCA.cer" | Out-Null
           Export-Certificate -Cert $cert -FilePath "output\VahidHedyati-RootCA.cer" | Out-Null
 
-          # کامپایل فایل نصبی استاندارد با Inno Setup
-          Write-Host "Compiling OyazDesk-Setup-v1.0.exe via Inno Setup..."
-          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
-
-          # امضای نهایی فایل نصبی و باینری با SignTool ۶۴ بیتی
+          # پیدا کردن ابزار امضای ۶۴ بیتی
           $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           if (-not $signtool) {
             $signtool = (Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           }
 
-          if ($signtool) {
-            Write-Host "Signing Installer with Publisher: Vahid Hedyati..."
+          # امضای باینری داخل پکیج
+          if ($signtool -and (Test-Path "dist\OyazDesk.exe")) {
+            Write-Host "Signing dist\OyazDesk.exe..."
+            & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "dist\OyazDesk.exe"
+          }
+
+          # چاپ ساختار فولدربندی dist برای اطمینان در لاگ‌ها
+          Write-Host "Files packaged inside installer:" -ForegroundColor Cyan
+          Get-ChildItem -Path dist | Select-Object Name, Length
+
+          # کامپایل فایل نصبی استاندارد با Inno Setup
+          Write-Host "Compiling OyazDesk-Setup-v1.0.exe via Inno Setup..."
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+          # امضای فایل نصبی نهایی
+          if ($signtool -and (Test-Path "output\OyazDesk-Setup-v1.0.exe")) {
+            Write-Host "Signing Installer executable..."
             & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk-Setup-v1.0.exe"
           }
 
           Remove-Item "output\temp_sign.pfx" -Force -ErrorAction SilentlyContinue
           Get-ChildItem output\
 
-      - name: Upload Enterprise Installer
+      - name: Upload Enterprise Installer & Root Certificate
         uses: actions/upload-artifact@v4
         with:
           name: OyazDesk-Enterprise-Installer-x64
-          path: output/OyazDesk-Setup-v1.0.exe
+          path: output/

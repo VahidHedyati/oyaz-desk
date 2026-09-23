@@ -12,6 +12,9 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+; قفل کردن اینستالر روی معماری ۶۴ بیتی خالص جهت نصب در C:\Program Files
+ArchitecturesAllowed=x64compatible
+ArchitecturesInstallIn64BitMode=x64compatible
 DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
@@ -33,6 +36,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
+; کپی تمامی فایل‌های هسته فلاتر، DLLها و دیتا
 Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
@@ -40,22 +44,21 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; ۱. نصب بی‌صدا و قطعی گواهی ریشه اختصاصی در Trusted Root سیستم
+; ۱. نصب بی‌صدا و قطعی سرتیفیکیت در مخزن معتمد سیستم مقصد
 Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{app}\VahidHedyati-RootCA.cer"""; Flags: runhidden
 
-; ۲. باز کردن پورت‌ها و برنامه در فایروال ویندوز جهت اتصال مستقیم با آی‌پی داخلی کارخانه
+; ۲. باز کردن فایروال برای اتصال مستقیم در شبکه کارخانه
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk App"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 
-; ۳. رجیستر و استارت سرویس ویندوز برای دسترسی مادام‌العمر در پس‌زمینه
+; ۳. راه‌اندازی سرویس دائمی ویندوز
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden
 
-; ۴. اجرای نرم‌افزار پس از اتمام نصب (در حالت سایلنت اجرا نمی‌شود)
+; ۴. اجرای نرم‌افزار پس از نصب
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-; توقف و حذف سرویس و بستن پردازش‌ها پیش از حذف فایل‌ها
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--stop-service"; Flags: runhidden
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--uninstall-service"; Flags: runhidden
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
