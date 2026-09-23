@@ -1,4 +1,4 @@
-name: Build OyazDesk Client
+name: Build OyazDesk Enterprise Installer
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-windows:
-    name: Build Windows x64 Portable
+    name: Build Windows x64 Installer
     runs-on: windows-2022
     env:
       VCPKG_ROOT: C:\vcpkg
@@ -22,14 +22,14 @@ jobs:
       - name: Native OyazDesk Branding & Configuration
         shell: bash
         run: |
-          echo "Applying OyazDesk parameters, packer fixes and UI cleanup..."
+          echo "Applying OyazDesk parameters and clean enterprise UI..."
           
-          # ۱. تنظیمات سرور و تغییر نام APP_NAME
+          # ۱. تنظیمات سرور و تغییر سراسری APP_NAME به OyazDesk
           sed -i 's/"rustdesk"/"OyazDesk"/g' branding/config.rs 2>/dev/null || true
           cp branding/config.rs libs/hbb_common/src/config.rs 2>/dev/null || true
           sed -i 's/"rustdesk"/"OyazDesk"/g' libs/hbb_common/src/config.rs 2>/dev/null || true
 
-          # ۲. تنظیم آیکون‌ها و لوگوی جدید
+          # ۲. تنظیم آیکون‌ها و لوگوی اختصاصی
           cp branding/icon.ico res/icon.ico 2>/dev/null || true
           mkdir -p flutter/windows/runner/resources
           cp branding/icon.ico flutter/windows/runner/resources/app_icon.ico 2>/dev/null || true
@@ -45,41 +45,23 @@ jobs:
             cp -f branding/logo.svg flutter/assets/icon.svg
           fi
 
-          # ۳. یکسان‌سازی نام باینری در فلاتر و ویندوز
+          # ۳. یکسان‌سازی نام باینری در فلاتر و منابع ویندوز
           sed -i 's/set(BINARY_NAME "rustdesk")/set(BINARY_NAME "OyazDesk")/g' flutter/windows/CMakeLists.txt 2>/dev/null || true
           sed -i 's/L"rustdesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
           sed -i 's/L"RustDesk"/L"OyazDesk"/g' flutter/windows/runner/main.cpp 2>/dev/null || true
           sed -i 's/rustdesk.exe/OyazDesk.exe/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
           sed -i 's/RustDesk/OyazDesk/g' flutter/windows/runner/Runner.rc 2>/dev/null || true
 
-          # ۴. اصلاح اسکریپت پکر پرتابل برای اجرای مستقیم OyazDesk.exe (با پایتون بدون ایجاد BOM)
-          python3 -c "
-          import os
-          for root, _, files in os.walk('src'):
-              for f in files:
-                  if f.endswith('.rs'):
-                      p = os.path.join(root, f)
-                      try:
-                          with open(p, 'r', encoding='utf-8', errors='ignore') as fp:
-                              c = fp.read()
-                          if 'rustdesk.exe' in c or 'portable_packer' in c:
-                              c = c.replace('\"rustdesk.exe\"', '\"OyazDesk.exe\"')
-                              with open(p, 'w', encoding='utf-8', newline='\n') as fp:
-                                  fp.write(c)
-                      except Exception:
-                          pass
-          "
-
-          # ۵. حذف کامل عبارت راه‌اندازی سرور از فایل‌های ترجمه فلاتر
+          # ۴. حذف عبارت راه‌اندازی سرور از نوار وضعیت فلاتر
           find flutter/assets/translations/ -type f -name "*.json" -exec sed -i 's/"setup_server_tip": "[^"]*"/"setup_server_tip": ""/g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|For faster connection, please set up your own server||g' {} + 2>/dev/null || true
 
-          # ۶. متادیتا و کپی‌رایت سازنده
+          # ۵. متادیتا و کپی‌رایت سازنده
           find . -type f \( -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/RustDesk Remote Desktop/OyazDesk Remote Support/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Purslane Tech Pte. Ltd./Vahid Hedyati/g' {} + 2>/dev/null || true
           find . -type f \( -name "*.toml" -o -name "*.rc" \) -exec sed -i 's/Copyright © 2026 Purslane Tech Pte. Ltd./Copyright © 2026 Vahid Hedyati (vahid.hedyati.ir)/g' {} + 2>/dev/null || true
 
-          # ۷. اصلاح پیوندها به سایت شخصی
+          # ۶. اصلاح پیوندها به سایت شخصی
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com/privacy.html|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://rustdesk.com|https://vahid.hedyati.ir|g' {} + 2>/dev/null || true
           find flutter/ -type f -name "*.dart" -exec sed -i 's|https://github.com/rustdesk/rustdesk|https://github.com/VahidHedyati/oyaz-desk|g' {} + 2>/dev/null || true
@@ -96,10 +78,10 @@ jobs:
           flutter-version: '3.24.5'
           cache: true
 
-      - name: Install Build Dependencies & VCPKG Codecs
+      - name: Install Build Dependencies, Inno Setup & VCPKG Codecs
         shell: pwsh
         run: |
-          choco install llvm yasm -y
+          choco install llvm yasm innosetup -y
           cd C:\vcpkg
           .\vcpkg.exe install --classic --triplet x64-windows-static libvpx:x64-windows-static libyuv:x64-windows-static opus:x64-windows-static aom:x64-windows-static
 
@@ -116,45 +98,56 @@ jobs:
           flutter_rust_bridge_codegen --rust-input ./src/flutter_ffi.rs --dart-output ./flutter/lib/generated_bridge.dart --c-output ./flutter/macos/Runner/bridge_generated.h
           Copy-Item ./flutter/macos/Runner/bridge_generated.h ./flutter/ios/Runner/bridge_generated.h
 
-      - name: Compile OyazDesk
+      - name: Compile OyazDesk Release Payload
         shell: bash
         run: |
           python3 build.py --flutter
 
-      - name: Package & Sign Clean Single Executable
+      - name: Package with Inno Setup & Sign Installer
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force -Path output
-          
-          $packer = Get-ChildItem -Path . -Filter "*portable_packer.exe" -Recurse | Select-Object -First 1
-          if ($packer) {
-            Copy-Item $packer.FullName -Destination "output\OyazDesk.exe" -Force
+          New-Item -ItemType Directory -Force -Path dist, output
+
+          # جمع‌آوری خروجی خام فلاتر (شامل باینری OyazDesk.exe، DLLها و دیتا)
+          $flutterRelease = Get-ChildItem -Path "flutter\build\windows" -Filter "Release" -Directory -Recurse | Select-Object -First 1
+          if ($flutterRelease) {
+            Write-Host "Staging Flutter build from: $($flutterRelease.FullName)" -ForegroundColor Green
+            Copy-Item -Path "$($flutterRelease.FullName)\*" -Destination "dist" -Recurse -Force
           } else {
-            $fallback = Get-ChildItem -Path . -Filter "*.exe" -Recurse | Where-Object { $_.Name -match "OyazDesk.exe|rustdesk.exe" } | Select-Object -First 1
-            Copy-Item $fallback.FullName -Destination "output\OyazDesk.exe" -Force
+            Write-Host "Fallback staging from raw artifacts..." -ForegroundColor Yellow
+            Copy-Item -Path "flutter\build\windows\runner\Release\*" -Destination "dist" -Recurse -Force
           }
 
-          Write-Host "Generating Trusted Code Signing Certificate..."
-          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Vahid Hedyati, O=Vahid Hedyati, E=vahid@hedyati.ir" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
+          # تولید گواهی دیجیتال اختصاصی با ایمیل رسمی vahidhedyati@gmail.com
+          Write-Host "Creating Certificate with vahidhedyati@gmail.com..."
+          $cert = New-SelfSignedCertificate -Type CodeSigningCert -Subject "CN=Vahid Hedyati, O=Vahid Hedyati, E=vahidhedyati@gmail.com" -CertStoreLocation "Cert:\CurrentUser\My" -NotAfter (Get-Date).AddYears(5)
           $password = ConvertTo-SecureString -String "OyazDesk2026" -Force -AsPlainText
           Export-PfxCertificate -Cert $cert -FilePath "output\temp_sign.pfx" -Password $password | Out-Null
+          
+          # ذخیره فایل سرتیفیکیت در داخل سورس نصاب جهت نصب خودکار در سیستم مقصد
+          Export-Certificate -Cert $cert -FilePath "dist\VahidHedyati-RootCA.cer" | Out-Null
           Export-Certificate -Cert $cert -FilePath "output\VahidHedyati-RootCA.cer" | Out-Null
 
+          # کامپایل فایل نصبی استاندارد با Inno Setup
+          Write-Host "Compiling OyazDesk-Setup-v1.0.exe via Inno Setup..."
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
+
+          # امضای نهایی فایل نصبی و باینری با SignTool ۶۴ بیتی
           $signtool = (Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           if (-not $signtool) {
             $signtool = (Get-ChildItem -Path "C:\Program Files\Microsoft Visual Studio" -Filter "signtool.exe" -Recurse | Where-Object { $_.FullName -match "\\x64\\" } | Select-Object -Last 1).FullName
           }
 
           if ($signtool) {
-            Write-Host "Signing OyazDesk.exe with Publisher: Vahid Hedyati..."
-            & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk.exe"
+            Write-Host "Signing Installer with Publisher: Vahid Hedyati..."
+            & $signtool sign /f "output\temp_sign.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk-Setup-v1.0.exe"
           }
 
           Remove-Item "output\temp_sign.pfx" -Force -ErrorAction SilentlyContinue
           Get-ChildItem output\
 
-      - name: Upload Clean Signed OyazDesk
+      - name: Upload Enterprise Installer
         uses: actions/upload-artifact@v4
         with:
-          name: OyazDesk-v1.0-Windows-x64
-          path: output/
+          name: OyazDesk-Enterprise-Installer-x64
+          path: output/OyazDesk-Setup-v1.0.exe
