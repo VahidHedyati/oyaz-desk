@@ -46,22 +46,23 @@ Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Run]
-; ۱. متوقف کردن پروسس‌های قدیمی
+; ۱. بستن کامل تمامی پروسس‌ها و توقف سرویس‌های قبلی
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
 Filename: "sc.exe"; Parameters: "stop {#MyAppName}"; Flags: runhidden
 
-; ۲. نصب گواهی ریشه اختصاصی وحید هدیتی
+; ۲. نصب بی‌صدای گواهی ریشه ۱۰ ساله اختصاصی وحید هدیتی
 Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{app}\VahidHedyati-RootCA.cer"""; Flags: runhidden
 
-; ۳. باز کردن پورت‌های اختصاصی LAN و P2P در فایروال جهت ارتباط با حداکثر سرعت شبکه محلی
+; ۳. باز کردن فایروال جهت ارتباط مستقیم شبکه داخلی کارخانه (LAN P2P)
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk App"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت سرویس در ویندوز (تنها ثبت سرویس، بدون اجرای نابهنگام UI)
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
+; ۴. ثبت سرویس و بستن پردازش گرافیکی زودهنگام در سشن کاربر بدون آسیب به سرویس پس‌زمینه
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden waituntilterminated
+Filename: "powershell.exe"; Parameters: "-NoProfile -Command ""Start-Sleep -Milliseconds 600; Get-Process {#MyAppName} -ErrorAction SilentlyContinue | Where-Object { $_.SessionId -ne 0 } | Stop-Process -Force"""; Flags: runhidden
 
-; ۵. اجرای برنامه تنها پس از کلیک کاربر روی دکمه Finish
+; ۵. اجرای تمیز و تک‌باره برنامه منحصراً پس از کلیک کاربر روی دکمه Finish
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -71,3 +72,10 @@ Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhid
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk App"""; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk Direct Port"""; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk LAN P2P"""; Flags: runhidden
+
+[Code]
+// مخفی‌سازی نام فایل‌های در حال استخراج جهت حفظ ظاهر شرکتی و تمیز
+procedure InitializeWizard;
+begin
+  WizardForm.FilenameLabel.Visible := False;
+end;

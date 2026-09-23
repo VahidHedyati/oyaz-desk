@@ -41,7 +41,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
   double? get height => bind.isIncomingOnly() ? null : em * 3;
 
   void onUsePublicServerGuide() {
-    const url = "https://rustdesk.com/pricing";
+    const url = "https://vahid.hedyati.ir";
     canLaunchUrlString(url).then((can) {
       if (can) {
         launchUrlString(url);
@@ -86,7 +86,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(', ', style: TextStyle(fontSize: em)),
+                const SizedBox.shrink(),
                 Flexible(
                   child: InkWell(
                     onTap: onUsePublicServerGuide,
@@ -94,7 +94,7 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
                       children: [
                         Flexible(
                           child: Text(
-                            translate('setup_server_tip'),
+                            '',
                             style: TextStyle(
                                 decoration: TextDecoration.underline,
                                 fontSize: em),
