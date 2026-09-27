@@ -202,11 +202,11 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
           break;
         case SettingsTabKey.account:
           settingTabs.add(
-              _TabInfo(tab, 'disabled_account', Icons.person_outline, Icons.person));
+              _TabInfo(tab, 'Account', Icons.person_outline, Icons.person));
           break;
         case SettingsTabKey.printer:
           settingTabs
-              .add(_TabInfo(tab, 'disabled_printer', Icons.print_outlined, Icons.print));
+              .add(_TabInfo(tab, 'Printer', Icons.print_outlined, Icons.print));
           break;
         case SettingsTabKey.about:
           settingTabs
@@ -2222,7 +2222,7 @@ class _AccountState extends State<_Account> {
     return ListView(
       controller: scrollController,
       children: [
-        _Card(title: 'disabled_account', children: [accountAction(), useInfo()]),
+        _Card(title: 'Account', children: [accountAction(), useInfo()]),
       ],
     ).marginOnly(bottom: _kListViewBottomMargin);
   }
@@ -2580,7 +2580,7 @@ class _AboutState extends State<_About> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Developed by IT Department of Oyaz Co.
+                            'Copyright (C) ${DateTime.now().toString().substring(0, 4)} IT Department of Oyaz Co.\n$license',
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(
