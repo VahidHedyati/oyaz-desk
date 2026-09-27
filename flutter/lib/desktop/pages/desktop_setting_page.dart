@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -202,11 +202,11 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
           break;
         case SettingsTabKey.account:
           settingTabs.add(
-              _TabInfo(tab, 'Account', Icons.person_outline, Icons.person));
+              _TabInfo(tab, 'disabled_account', Icons.person_outline, Icons.person));
           break;
         case SettingsTabKey.printer:
           settingTabs
-              .add(_TabInfo(tab, 'Printer', Icons.print_outlined, Icons.print));
+              .add(_TabInfo(tab, 'disabled_printer', Icons.print_outlined, Icons.print));
           break;
         case SettingsTabKey.about:
           settingTabs
@@ -2222,7 +2222,7 @@ class _AccountState extends State<_Account> {
     return ListView(
       controller: scrollController,
       children: [
-        _Card(title: 'Account', children: [accountAction(), useInfo()]),
+        _Card(title: 'disabled_account', children: [accountAction(), useInfo()]),
       ],
     ).marginOnly(bottom: _kListViewBottomMargin);
   }
@@ -2580,7 +2580,7 @@ class _AboutState extends State<_About> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Copyright Â© ${DateTime.now().toString().substring(0, 4)} Purslane Tech Pte. Ltd.\n$license',
+                            'Developed by IT Department of Oyaz Co.
                             style: const TextStyle(color: Colors.white),
                           ),
                           Text(

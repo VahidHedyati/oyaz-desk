@@ -58,24 +58,44 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت سرویس در پس‌زمینه و بستن بی‌درنگ پردازش گرافیکی ایجادشده حین نصب
+; ۴. ثبت سرویس در ویندوز
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden waituntilterminated
-Filename: "cmd.exe"; Parameters: "/c ping 127.0.0.1 -n 2 >nul & taskkill /F /FI ""SESSION ne 0"" /IM {#MyAppExeName}"; Flags: runhidden
 
-; ۵. اجرای تمیز و تک‌باره برنامه منحصراً پس از کلیک کاربر روی دکمه Finish
+; ۵. اجرای برنامه منحصراً پس از کلیک کاربر روی دکمه Finish
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--stop-service"; Flags: runhidden
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--uninstall-service"; Flags: runhidden
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
+Filename: "sc.exe"; Parameters: "stop {#MyAppName}"; Flags: runhidden
+Filename: "sc.exe"; Parameters: "delete {#MyAppName}"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk App"""; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk Direct Port"""; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk LAN P2P"""; Flags: runhidden
 
 [Code]
-// مخفی‌سازی نام فایل‌های در حال استخراج جهت حفظ ظاهر شرکتی و تمیز
+// بستن اجباری پروسس‌ها قبل از شروع عملیات حذف جهت جلوگیری از گیر کردن
+function InitializeUninstall(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Exec('taskkill.exe', '/F /IM {#MyAppExeName} /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Exec('sc.exe', 'stop {#MyAppName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := True;
+end;
+
+// مخفی‌سازی نام فایل‌های در حال استخراج
 procedure InitializeWizard;
 begin
   WizardForm.FilenameLabel.Visible := False;
+end;
+
+// بستن پروسس کمکی سرویس پیش از نمایش صفحه Finish ستاپ
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  ResultCode: Integer;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    Exec('taskkill.exe', '/F /IM {#MyAppExeName} /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  end;
 end;
