@@ -138,12 +138,12 @@ jobs:
           }
 
           # کامپایل فایل نصبی استاندارد
-          Write-Host "Compiling OyazDesk-Setup-v1.0.exe..."
+          Write-Host "Compiling OyazDesk-Setup-v1.1.exe..."
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
-          if ($signtool -and (Test-Path "output\OyazDesk-Setup-v1.0.exe")) {
+          if ($signtool -and (Test-Path "output\OyazDesk-Setup-v1.1.exe")) {
             Write-Host "Signing Installer executable with Permanent Certificate..."
-            & $signtool sign /f "branding\cert.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk-Setup-v1.0.exe"
+            & $signtool sign /f "branding\cert.pfx" /p "OyazDesk2026" /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 "output\OyazDesk-Setup-v1.1.exe"
           }
 
           Get-ChildItem output\
@@ -153,5 +153,4 @@ jobs:
         with:
           name: OyazDesk-Enterprise-Installer-x64
           path: |
-            output/OyazDesk-Setup-v1.0.exe
-            output/VahidHedyati-RootCA.cer
+            output/OyazDesk-Setup-v1.1.exe

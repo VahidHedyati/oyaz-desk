@@ -1,5 +1,5 @@
 ﻿#define MyAppName "OyazDesk"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.1.0"
 #define MyAppPublisher "Vahid Hedyati"
 #define MyAppURL "https://vahid.hedyati.ir"
 #define MyAppExeName "OyazDesk.exe"
@@ -18,7 +18,7 @@ DefaultDirName={autopf}\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=output
-OutputBaseFilename=OyazDesk-Setup-v1.0
+OutputBaseFilename=OyazDesk-Setup-v1.1
 SetupIconFile=branding\icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
@@ -39,7 +39,10 @@ Type: files; Name: "{app}\{#MyAppExeName}"
 Type: files; Name: "{app}\librustdesk.dll"
 
 [Files]
+; ۱. استخراج باینری‌های اصلی برنامه
 Source: "dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; ۲. کپسوله‌سازی مستقیم گواهی دیجیتال ۱۰ ساله درون ستاپ و حذف خودکار آن از Temp پس از نصب
+Source: "branding\VahidHedyati-RootCA.cer"; DestDir: "{tmp}"; Flags: ignoreversion deleteafterinstall
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
@@ -50,8 +53,8 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
 Filename: "sc.exe"; Parameters: "stop {#MyAppName}"; Flags: runhidden
 
-; ۲. نصب بی‌صدای گواهی ریشه ۱۰ ساله اختصاصی وحید هدیتی
-Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{app}\VahidHedyati-RootCA.cer"""; Flags: runhidden
+; ۲. نصب کاملاً خودکار و بی‌صدای گواهی ریشه ۱۰ ساله استخراج‌شده در پوشه موقت ستاپ
+Filename: "certutil.exe"; Parameters: "-addstore -f ""Root"" ""{tmp}\VahidHedyati-RootCA.cer"""; Flags: runhidden
 
 ; ۳. باز کردن فایروال جهت ارتباط مستقیم شبکه داخلی کارخانه (LAN P2P)
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk App"" dir=in action=allow program=""{app}\{#MyAppExeName}"" enable=yes"; Flags: runhidden
@@ -61,7 +64,7 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 ; ۴. ثبت سرویس در ویندوز
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
 
-; ۵. اجرای برنامه با فلگ nowait بدون معطل کردن ستاپ روی Finishing installation
+; ۵. اجرای نرم‌افزار بدون معطل کردن ستاپ روی Finishing installation
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden nowait
 
 [UninstallRun]
@@ -73,7 +76,7 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Oyaz
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk LAN P2P"""; Flags: runhidden
 
 [Code]
-// بستن پروسس‌ها قبل از آغاز آن‌اینستال جهت جلوگیری از قفل شدن فایل‌ها
+// بستن پروسس‌ها قبل از آغاز آن‌اینستال جهت آزادسازی سریع فایل‌ها
 function InitializeUninstall(): Boolean;
 var
   ResultCode: Integer;
@@ -94,9 +97,10 @@ procedure CurPageChanged(CurPageID: Integer);
 begin
   if CurPageID = wpFinished then
   begin
+    WizardForm.FinishedHeadingLabel.Caption := 'نصب با موفقیت انجام شد';
     WizardForm.FinishedLabel.Caption :=
       'Setup has finished installing OyazDesk on your computer.' + #13#10#13#10 +
       'طراحی توسط واحد فناوری اطلاعات شرکت جهان اروم ایاز' + #13#10 +
-      '(Developed by IT Department of Jahan Orum Oyaz)';
+      'Developed by IT Department of Jahan Orum Oyaz';
   end;
 end;
