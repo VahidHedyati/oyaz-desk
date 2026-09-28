@@ -1,4 +1,4 @@
-#define MyAppName "OyazDesk"
+﻿#define MyAppName "OyazDesk"
 #define MyAppVersion "1.0.0"
 #define MyAppPublisher "Vahid Hedyati"
 #define MyAppURL "https://vahid.hedyati.ir"
@@ -58,12 +58,9 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت سرویس در ویندوز و بستن بلافاصله پروسس گرافیکی ایجادشده
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden waituntilterminated
-Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
-
-; ۵. اجرای برنامه فقط و فقط پس از کلیک کاربر روی دکمه Finish
-Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+; ۴. ثبت و اجرای سرویس و اجرای نرم‌افزار بدون چک‌باکس در صفحه ویزارد
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden
 
 [UninstallRun]
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
@@ -90,13 +87,14 @@ begin
   WizardForm.FilenameLabel.Visible := False;
 end;
 
-// اطمینان از بسته بودن پنجره‌های بازشده حین نمایش صفحه Finish
+// درج مشخصات واحد IT شرکت ایاز در صفحه پایانی ویزارد
 procedure CurPageChanged(CurPageID: Integer);
-var
-  ResultCode: Integer;
 begin
   if CurPageID = wpFinished then
   begin
-    Exec('taskkill.exe', '/F /IM {#MyAppExeName} /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+    WizardForm.FinishedLabel.Caption :=
+      'Setup has finished installing OyazDesk on your computer.' + #13#10#13#10 +
+      'طراحی توسط واحد IT شرکت جهان اروم ایاز' + #13#10 +
+      '(Developed by IT Department of Jahan Urom Oyaz)';
   end;
 end;
