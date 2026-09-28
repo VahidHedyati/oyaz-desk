@@ -58,10 +58,11 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت سرویس در ویندوز
+; ۴. ثبت سرویس در ویندوز و بستن بلافاصله پروسس گرافیکی ایجادشده
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden waituntilterminated
+Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
 
-; ۵. اجرای برنامه منحصراً پس از کلیک کاربر روی دکمه Finish
+; ۵. اجرای برنامه فقط و فقط پس از کلیک کاربر روی دکمه Finish
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
@@ -73,7 +74,7 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""Oyaz
 Filename: "netsh.exe"; Parameters: "advfirewall firewall delete rule name=""OyazDesk LAN P2P"""; Flags: runhidden
 
 [Code]
-// بستن اجباری پروسس‌ها قبل از شروع عملیات حذف جهت جلوگیری از گیر کردن
+// بستن پروسس‌ها قبل از آغاز آن‌اینستال جهت جلوگیری از قفل شدن فایل‌ها
 function InitializeUninstall(): Boolean;
 var
   ResultCode: Integer;
@@ -83,18 +84,18 @@ begin
   Result := True;
 end;
 
-// مخفی‌سازی نام فایل‌های در حال استخراج
+// مخفی‌سازی نام فایل‌های در حال استخراج در صفحه نصب
 procedure InitializeWizard;
 begin
   WizardForm.FilenameLabel.Visible := False;
 end;
 
-// بستن پروسس کمکی سرویس پیش از نمایش صفحه Finish ستاپ
-procedure CurStepChanged(CurStep: TSetupStep);
+// اطمینان از بسته بودن پنجره‌های بازشده حین نمایش صفحه Finish
+procedure CurPageChanged(CurPageID: Integer);
 var
   ResultCode: Integer;
 begin
-  if CurStep = ssPostInstall then
+  if CurPageID = wpFinished then
   begin
     Exec('taskkill.exe', '/F /IM {#MyAppExeName} /T', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
   end;
