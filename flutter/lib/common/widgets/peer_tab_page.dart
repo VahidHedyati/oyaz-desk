@@ -129,7 +129,7 @@ class _PeerTabPageState extends State<PeerTabPage>
         onReorder: model.reorder,
         scrollDirection: Axis.horizontal,
         physics: NeverScrollableScrollPhysics(),
-        children: model.visibleEnabledOrderedIndexs.map((t) {
+        children: model.visibleEnabledOrderedIndexs.where((t) => t < entries.length).map((t) {
           final selected = model.currentTab == t;
           final color = selected
               ? MyTheme.tabbar(context).selectedTextColor

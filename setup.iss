@@ -58,9 +58,11 @@ Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDes
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk Direct Port"" dir=in action=allow protocol=TCP localport=21118"; Flags: runhidden
 Filename: "netsh.exe"; Parameters: "advfirewall firewall add rule name=""OyazDesk LAN P2P"" dir=in action=allow protocol=UDP localport=21116"; Flags: runhidden
 
-; ۴. ثبت و اجرای سرویس و اجرای نرم‌افزار بدون چک‌باکس در صفحه ویزارد
+; ۴. ثبت سرویس در ویندوز
 Filename: "{app}\{#MyAppExeName}"; Parameters: "--install-service"; Flags: runhidden
-Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden
+
+; ۵. اجرای برنامه با فلگ nowait بدون معطل کردن ستاپ روی Finishing installation
+Filename: "{app}\{#MyAppExeName}"; Parameters: "--start-service"; Flags: runhidden nowait
 
 [UninstallRun]
 Filename: "taskkill.exe"; Parameters: "/F /IM {#MyAppExeName} /T"; Flags: runhidden
@@ -87,14 +89,14 @@ begin
   WizardForm.FilenameLabel.Visible := False;
 end;
 
-// درج مشخصات واحد IT شرکت ایاز در صفحه پایانی ویزارد
+// درج مشخصات رسمی واحد فناوری اطلاعات شرکت جهان اروم ایاز
 procedure CurPageChanged(CurPageID: Integer);
 begin
   if CurPageID = wpFinished then
   begin
     WizardForm.FinishedLabel.Caption :=
       'Setup has finished installing OyazDesk on your computer.' + #13#10#13#10 +
-      'طراحی توسط واحد IT شرکت جهان اروم ایاز' + #13#10 +
-      '(Developed by IT Department of Jahan Urom Oyaz)';
+      'طراحی توسط واحد فناوری اطلاعات شرکت جهان اروم ایاز' + #13#10 +
+      '(Developed by IT Department of Jahan Orum Oyaz)';
   end;
 end;
